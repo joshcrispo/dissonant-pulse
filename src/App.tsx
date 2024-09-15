@@ -6,6 +6,7 @@ import Events from './pages/Events';
 import About from './pages/About';
 import Login from './pages/Login';
 import Navbar from './components/Navbar';
+import Signup from './pages/Signup';
 
 const App: React.FC = () => {
   return (
@@ -15,7 +16,8 @@ const App: React.FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/events" element={<Events />} />
         <Route path="/about" element={<About />} />
-        <Route path="/admin" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </Router>
   );

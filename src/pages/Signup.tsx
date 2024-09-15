@@ -1,35 +1,35 @@
 import React, { useState } from 'react';
-import {  signInWithEmailAndPassword   } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
 
-const Login: React.FC = () => {
+const Signup: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = async (e: React. MouseEvent<HTMLButtonElement>): Promise<void> => {
+    const handleSignup = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
         e.preventDefault();
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-            console.log(user)
-            console.log('Login successful');
-            navigate('/');
+            console.log(user);
+            console.log('Sign-up successful');
+            // Redirect to the home page after successful sign-up
+            navigate('/'); // Change the path to your home page route
         } catch (error: unknown) {
             if (error instanceof Error) {
-                console.error('Login failed:', error.message);
+                console.error('Sign-up failed:', error.message);
             } else {
-                console.error('An unexpected error occured');
+                console.error('An unexpected error occurred');
             }
-            
         }
     };
 
     return (
         <div className="min-h-screen bg-black flex justify-center items-center">
             <div className="bg-black p-8 border-2 border-white w-1/2 -mt-20 max-w-lg">
-                <h1 className="text-4xl font-bold text-white mb-6 text-center">Login</h1>
+                <h1 className="text-4xl font-bold text-white mb-6 text-center">Sign Up</h1>
                 
                 <div className="mb-4">
                     <label className="block text-white mb-2" htmlFor="email">Email</label>
@@ -54,22 +54,23 @@ const Login: React.FC = () => {
                         placeholder="Enter your password"
                     />
                 </div>
-
+                
                 <button
-                    onClick={handleLogin}
-                    className="w-full bg-black border border-white text-white py-2 px-4 hover:bg-gray-700 transition duration-200"
+                    onClick={handleSignup}
+                    className="text-white bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded"
                 >
-                    Login
+                    Sign Up
                 </button>
-                <p className="text-white text-center mt-4">
-                    Don't have an account?{' '}
-                    <Link to="/signup" className="text-blue-500 hover:underline">
-                        Sign Up
+                
+                <p className="text-white mt-4">
+                    Already have an account?{' '}
+                    <Link to="/login" className="text-blue-500 hover:underline">
+                        Log In
                     </Link>
                 </p>
             </div>
         </div>
     );
-};    
+};
 
-export default Login;
+export default Signup;

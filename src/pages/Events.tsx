@@ -1,8 +1,12 @@
 import React from 'react';
+import { Helmet } from 'react-helmet';
 
 const Events: React.FC = () => {
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center">
+            <Helmet>
+                <title>Dissonant Pulse - Events</title>
+            </Helmet>
             <section className="mt-40 mx-auto text-center max-w-3xl">
             <h1 className="my-16 text-4xl font-bold">Upcoming Events</h1>
                 <ul className="my-8 space-y-2">

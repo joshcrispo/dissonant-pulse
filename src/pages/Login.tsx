@@ -1,34 +1,63 @@
-import React, { useState } from 'react';
-import {  signInWithEmailAndPassword   } from 'firebase/auth';
+import React, { useState, useContext } from 'react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { UserContext } from '../context/UserContext';
 import { auth } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const { setUser } = useContext(UserContext); // Access setUser from UserContext
 
-    const handleLogin = async (e: React. MouseEvent<HTMLButtonElement>): Promise<void> => {
+    const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
         e.preventDefault();
         try {
+            // Authenticate the user with email and password
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            console.log(user)
-            console.log('Login successful');
-            navigate('/');
+            const currentUser = userCredential.user;
+
+            // Query the Firestore collection for the user with the matching email
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userDoc = await getDoc(userRef);
+
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const userRole = userData.role;
+
+                console.log('User role:', userRole);
+                console.log('Login successful');
+
+                // Update the global user context
+                setUser({
+                    uid: currentUser.uid,
+                    email: currentUser.email || '',
+                    username: userData.username || 'Anonymous',
+                });
+
+                // Redirect to the home page after successful login
+                navigate('/'); // Change the path to your home page route
+            } else {
+                console.error('User not found');
+            }
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error('Login failed:', error.message);
             } else {
-                console.error('An unexpected error occured');
+                console.error('An unexpected error occurred');
             }
-            
         }
     };
 
     return (
         <div className="min-h-screen bg-black flex justify-center items-center">
-            <div className="bg-black p-8 border-2 border-white w-1/2 -mt-20 max-w-lg">
+            <Helmet>
+                <title>Dissonant Pulse - Login</title>
+            </Helmet>
+            <div className="bg-black p-8 border-2 border-white w-1/2 max-w-lg">
                 <h1 className="text-4xl font-bold text-white mb-6 text-center">Login</h1>
                 
                 <div className="mb-4">
@@ -70,6 +99,6 @@ const Login: React.FC = () => {
             </div>
         </div>
     );
-};    
+};
 
 export default Login;

@@ -1,22 +1,36 @@
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
+import { collection, addDoc } from 'firebase/firestore'; // Import Firestore functions
+import { Helmet } from 'react-helmet';
+
 
 const Signup: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
+
     const navigate = useNavigate();
 
-    const handleSignup = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
+    const handleSignup = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            console.log(user);
+            // Create a new user account
+            await createUserWithEmailAndPassword(auth, email, password);
+
+            // Store user data in Firestore (you can add more fields as needed)
+            const usersCollection = collection(db, 'users');
+            await addDoc(usersCollection, {
+                email,
+                password,
+                username: username,
+                role: 'user', // Set the role to 'user' for all sign-ups
+            });
+
             console.log('Sign-up successful');
-            // Redirect to the home page after successful sign-up
-            navigate('/'); // Change the path to your home page route
+            // Redirect to the home page or any other desired route
+            // (you can use React Router for navigation)
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error('Sign-up failed:', error.message);
@@ -28,9 +42,23 @@ const Signup: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-black flex justify-center items-center">
-            <div className="bg-black p-8 border-2 border-white w-1/2 -mt-20 max-w-lg">
+            <Helmet>
+                <title>Dissonant Pulse - Signup</title>
+            </Helmet>
+            <div className="bg-black p-8 border-2 border-white w-1/2 max-w-lg">
                 <h1 className="text-4xl font-bold text-white mb-6 text-center">Sign Up</h1>
                 
+                <div className="mb-4">
+                    <label className="block text-white mb-2" htmlFor="username">Username</label>
+                    <input
+                        type="text"
+                        id="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="w-full p-2 border border-white bg-black text-white focus:outline-none"
+                        placeholder="Enter your username"
+                    />
+                </div>
                 <div className="mb-4">
                     <label className="block text-white mb-2" htmlFor="email">Email</label>
                     <input
@@ -57,12 +85,12 @@ const Signup: React.FC = () => {
                 
                 <button
                     onClick={handleSignup}
-                    className="text-white bg-blue-500 hover:bg-blue-700 px-4 py-2 rounded"
+                    className="w-full bg-black border border-white text-white py-2 px-4 hover:bg-gray-700 transition duration-200"
                 >
                     Sign Up
                 </button>
                 
-                <p className="text-white mt-4">
+                <p className="text-white text-center mt-4">
                     Already have an account?{' '}
                     <Link to="/login" className="text-blue-500 hover:underline">
                         Log In

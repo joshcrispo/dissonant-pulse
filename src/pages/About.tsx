@@ -1,10 +1,13 @@
 import React from 'react';
 import DissonantPulseLogo from '../assets/DP.png'
+import { Helmet } from 'react-helmet';
 
-
-const Events: React.FC = () => {
+const About: React.FC = () => {
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center">
+            <Helmet>
+                <title>Dissonant Pulse - About</title>
+            </Helmet>
             <div className=" flex items-center">
                 <img src={DissonantPulseLogo} alt="Dissonant Pulse"  />  
             </div>
@@ -13,4 +16,4 @@ const Events: React.FC = () => {
     );
 };
 
-export default Events;
+export default About;

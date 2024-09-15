@@ -1,8 +1,12 @@
 import React from 'react';
+import { Helmet } from 'react-helmet';
 
 const Home: React.FC = () => {
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center ">
+            <Helmet>
+                <title>Dissonant Pulse - Home</title>
+            </Helmet>
             <h1 className="mt-40 text-4xl font-bold">Welcome to Dissonant Pulse</h1>
             <p className="text-lg mt-4">Experience the latest and greatest in underground techno.</p>
 

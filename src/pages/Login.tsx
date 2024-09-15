@@ -19,29 +19,34 @@ const Login: React.FC = () => {
             // Authenticate the user with email and password
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const currentUser = userCredential.user;
-
+    
+            // Log the UID and path
+            console.log("UID:", currentUser.uid);
+            console.log("Document path:", `users/${currentUser.uid}`);
+    
             // Query the Firestore collection for the user with the matching email
             const userRef = doc(db, 'users', currentUser.uid);
             const userDoc = await getDoc(userRef);
-
+    
+            // Check if the document exists
             if (userDoc.exists()) {
                 const userData = userDoc.data();
                 const userRole = userData.role;
-
+    
                 console.log('User role:', userRole);
                 console.log('Login successful');
-
+    
                 // Update the global user context
                 setUser({
                     uid: currentUser.uid,
                     email: currentUser.email || '',
                     username: userData.username || 'Anonymous',
                 });
-
+    
                 // Redirect to the home page after successful login
                 navigate('/'); // Change the path to your home page route
             } else {
-                console.error('User not found');
+                console.error('User not found in Firestore');
             }
         } catch (error: unknown) {
             if (error instanceof Error) {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
-import { collection, addDoc } from 'firebase/firestore'; // Import Firestore functions
+import { collection, addDoc, setDoc, doc } from 'firebase/firestore'; // Import Firestore functions
 import { Helmet } from 'react-helmet';
 
 
@@ -17,20 +17,19 @@ const Signup: React.FC = () => {
         e.preventDefault();
         try {
             // Create a new user account
-            await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const currentUser = userCredential.user;
 
-            // Store user data in Firestore (you can add more fields as needed)
-            const usersCollection = collection(db, 'users');
-            await addDoc(usersCollection, {
-                email,
-                password,
+            // Store user data in Firestore using the UID as the document ID
+            await setDoc(doc(db, 'users', currentUser.uid), {
+                email: currentUser.email,
                 username: username,
                 role: 'user', // Set the role to 'user' for all sign-ups
             });
 
             console.log('Sign-up successful');
             // Redirect to the home page or any other desired route
-            // (you can use React Router for navigation)
+            navigate('/'); // Change the path to your home page route
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error('Sign-up failed:', error.message);

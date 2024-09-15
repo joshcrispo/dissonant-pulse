@@ -44,24 +44,10 @@ const Navbar: React.FC = () => {
                         </Link>
                     </li>
                     <li>
-                        {user ? (
-                            <>
-                                <span className="text-white">
-                                    Hi, {user.username || user.email} {/* Display the user's name or email */}
-                                </span>
-                                <Link to="/account" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 border-2 border-gray-600 px-6 py-2 text-center block">
-                                    Account
-                                </Link>
-                                <button onClick={() => auth.signOut()} className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 border-2 border-gray-600 px-6 py-2 text-center block">
-                                    Sign out
-                                </button>
-                            </>
-                        ) : (
-                            <button ref={buttonRef} onClick={() => setIsModalVisible(true)} className="focus:outline-none">
-                                <UserIcon className="h-11 w-11 text-white hover:text-gray-400 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105" />
-                            </button>
-                        )}
-                        {isModalVisible && !user && <LoginModal onClose={handleModalClose} buttonRef={buttonRef} />}
+                        <button ref={buttonRef} onClick={() => setIsModalVisible(true)} className="focus:outline-none">
+                            <UserIcon className="h-11 w-11 text-white hover:text-gray-400 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105" />
+                        </button>
+                        {isModalVisible && <LoginModal onClose={handleModalClose} buttonRef={buttonRef} />}
                     </li>
                 </ul>
             </div>

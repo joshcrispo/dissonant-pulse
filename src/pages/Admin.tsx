@@ -16,7 +16,9 @@ type Event = {
     artists: string[];
     startDate: Date;
     endDate: Date;
-    photoURL?: string;  // Add photoURL to Event type
+    photoURL?: string;
+    location?: string;
+    club?: string;
 };
 
 const Admin: React.FC = () => {
@@ -25,6 +27,8 @@ const Admin: React.FC = () => {
     const [artists, setArtists] = useState<string[]>(['']);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [location, setLocation] = useState('');
+    const [club, setClub] = useState('');
     const [error, setError] = useState('');
     const [editingEvent, setEditingEvent] = useState<Event | null>(null);
     const [showModal, setShowModal] = useState(false);
@@ -42,7 +46,9 @@ const Admin: React.FC = () => {
                 artists: data.artists,
                 startDate: (data.startDate as any).toDate(),
                 endDate: (data.endDate as any).toDate(),
-                photoURL: data.photoURL  // fetch the photoURL
+                photoURL: data.photoURL,
+                location: data.location,
+                club: data.club
             };
         }).sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
         setEvents(eventsList);
@@ -73,44 +79,6 @@ const Admin: React.FC = () => {
         return await getDownloadURL(imageRef);
     };
 
-    const handleAddEvent = async () => {
-        if (!eventName || !artists.length || !startDate || !endDate) {
-            setError('Please fill in all fields.');
-            return;
-        }
-
-        try {
-            let photoURL = "";
-            if (imageUpload) {
-                photoURL = await uploadFile();  // Upload the image and get the URL
-            }
-
-            const eventsCollection = collection(db, 'events');
-            await addDoc(eventsCollection, {
-                eventName,
-                artists,
-                startDate: new Date(startDate),
-                endDate: new Date(endDate),
-                photoURL,  // Save photo URL in Firestore
-                createdAt: new Date(),
-            });
-
-            // Clear the form fields after submission
-            setEventName('');
-            setArtists(['']);
-            setStartDate('');
-            setEndDate('');
-            setImageUpload(null);
-            setImagePreview(null);  // Clear image preview
-            setError('');
-            setShowModal(false);
-            fetchEvents(); // Fetch events again to update the list
-        } catch (error) {
-            console.error('Error adding event:', error);
-            setError('Failed to add event.');
-        }
-    };
-
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -135,36 +103,95 @@ const Admin: React.FC = () => {
         setArtists(event.artists);
         setStartDate(event.startDate.toISOString().substring(0, 16));
         setEndDate(event.endDate.toISOString().substring(0, 16));
+        setLocation(event.location || '');
+        setClub(event.club || '');
         setImagePreview(event.photoURL || null);  // Show existing image if available
         setShowModal(true);
     };
 
-    const handleUpdateEvent = async () => {
-        if (!eventName || !artists.length || !startDate || !endDate) {
+    const handleAddEvent = async () => {
+        if (!eventName || !artists.length || !startDate || !endDate || !location || !club) {
             setError('Please fill in all fields.');
             return;
         }
 
         try {
+            let photoURL = "";
+            if (imageUpload) {
+                photoURL = await uploadFile();
+            }
+
+            const eventsCollection = collection(db, 'events');
+            await addDoc(eventsCollection, {
+                eventName,
+                artists,
+                startDate: new Date(startDate),
+                endDate: new Date(endDate),
+                photoURL,
+                location,
+                club,
+                createdAt: new Date(),
+            });
+
+            setEventName('');
+            setArtists(['']);
+            setStartDate('');
+            setEndDate('');
+            setLocation('');
+            setClub('');
+            setImageUpload(null);
+            setImagePreview(null);
+            setError('');
+            setShowModal(false);
+            fetchEvents(); 
+        } catch (error) {
+            console.error('Error adding event:', error);
+            setError('Failed to add event.');
+        }
+    };
+
+    const handleUpdateEvent = async () => {
+        if (!eventName || !artists.length || !startDate || !endDate || !location || !club) {
+            setError('Please fill in all fields.');
+            return;
+        }
+    
+        try {
             const eventRef = doc(db, 'events', editingEvent!.id);
+    
+            let photoURL = editingEvent!.photoURL;
+            if (imageUpload) {
+                // Upload the new image to storage
+                const imageRef = storageRef(storage, `events/${editingEvent!.id}`);
+                await uploadBytes(imageRef, imageUpload);
+                photoURL = await getDownloadURL(imageRef);
+            }
+    
             await updateDoc(eventRef, {
                 eventName,
                 artists,
                 startDate: new Date(startDate),
                 endDate: new Date(endDate),
+                location,
+                club,
+                photoURL
             });
-
+    
             setEvents(events.map(event =>
                 event.id === editingEvent!.id
-                    ? { ...event, eventName, artists, startDate: new Date(startDate), endDate: new Date(endDate) }
+                    ? { ...event, eventName, artists, startDate: new Date(startDate), endDate: new Date(endDate), location, club, photoURL }
                     : event
             ));
-
+    
             setEditingEvent(null);
             setEventName('');
             setArtists(['']);
             setStartDate('');
             setEndDate('');
+            setLocation('');
+            setClub('');
+            setImageUpload(null);
+            setImagePreview(null);
             setError('');
             setShowModal(false);
         } catch (error) {
@@ -188,6 +215,8 @@ const Admin: React.FC = () => {
                         <button className="bg-black text-white p-2 border border-gray-600 rounded mb-2" onClick={handleAddArtist}><FaPlus /></button>
                         <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="datetime-local" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
                         <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                        <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="text" value={club} onChange={(e) => setClub(e.target.value)} placeholder="Club" />
+                        <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location (Street Name, Eircode)" />
                         
                         <label className="block mb-2">Event Image</label>
                         <button
@@ -203,8 +232,8 @@ const Admin: React.FC = () => {
                             accept="image/*"
                             onChange={handleImageChange}
                         />
-                        {imagePreview && <img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover mt-2" />}
-
+                        {imagePreview && <img src={imagePreview} alt="Preview" className="w-full h-32 object-cover mt-2" />}
+        
                         <button className="bg-black text-white p-2 border border-white" onClick={editingEvent ? handleUpdateEvent : handleAddEvent}>
                             {editingEvent ? 'Update Event' : 'Add Event'}
                         </button>
@@ -213,21 +242,30 @@ const Admin: React.FC = () => {
                 </div>
             )}
             <div className="space-y-4 w-full max-w-4xl">
-                {events.map(event => (
-                    <div key={event.id} className="bg-black text-white p-4 border border-gray-600 shadow-lg">
-                        <h2 className="text-2xl font-bold">{event.eventName}</h2>
-                        <p className="font-bold">Artists: {event.artists.join(', ')}</p>
-                        <p>Start Date: {event.startDate.toLocaleString()}</p>
-                        <p>End Date: {event.endDate.toLocaleString()}</p>
-                        {event.photoURL && (
-                            <img src={event.photoURL} alt={`${event.eventName} cover`} className="w-64 h-64 object-cover mt-2" />
-                        )}
-                        <div className="flex space-x-2 mt-2">
-                            <button className="bg-yellow-500 text-white p-2" onClick={() => handleEditEvent(event)}><FaEdit /></button>
-                            <button className="bg-red-500 text-white p-2" onClick={() => handleDeleteEvent(event.id)}><FaTrash /></button>
+                {events.map(event => {
+                    // Formatting start and end times
+                    const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                    const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                    
+                    return (
+                        <div key={event.id} className="flex items-center bg-black text-white p-4 border border-gray-600 shadow-lg">
+                            {event.photoURL && (
+                                <img src={event.photoURL} alt={`${event.eventName} cover`} className="w-32 h-32 object-cover mr-4" />
+                            )}
+                            <div className="flex-1">
+                                <h2 className="text-2xl font-bold mb-2">{event.eventName}</h2>
+                                <p className="font-bold mb-1">{event.artists.join(', ')}</p>
+                                <p className="font-bold mb-1">{event.club}, {event.location}</p>
+                                <p className="mb-1">{startTime} - {endTime}</p>
+    
+                                <div className="flex space-x-2 mt-2">
+                                    <button className="bg-yellow-500 text-white p-2" onClick={() => handleEditEvent(event)}><FaEdit /></button>
+                                    <button className="bg-red-500 text-white p-2" onClick={() => handleDeleteEvent(event.id)}><FaTrash /></button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

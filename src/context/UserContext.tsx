@@ -7,6 +7,7 @@ interface User {
     uid: string;
     email: string;
     username: string;
+    role: string;
 }
 
 interface UserContextProps {
@@ -38,6 +39,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                             uid: currentUser.uid,
                             email: currentUser.email || '',
                             username: userData.username || 'Anonymous',
+                            role: userData.role,
                         });
                     }
                 } catch (error) {

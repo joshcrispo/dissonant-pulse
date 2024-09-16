@@ -42,6 +42,7 @@ const Login: React.FC = () => {
                     uid: currentUser.uid,
                     email: currentUser.email || '',
                     username: userData.username || 'Anonymous',
+                    role: userData.role, // Set the role
                 });
 
                 // Redirect to the home page after successful login

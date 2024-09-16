@@ -56,6 +56,11 @@ const LoginModal: React.FC<ModalProps> = ({ onClose, buttonRef }) => {
                         <Link to="/account" className={`mb-4 ${buttonClass}`}>
                             Account
                         </Link>
+                        {user.role === 'admin' && (
+                            <Link to="/admin" className={`mb-4 ${buttonClass}`}>
+                                Admin
+                            </Link>
+                        )}
                         <button onClick={handleSignOut} className={`mb-4 ${buttonClass}`}>
                             Sign out
                         </button>

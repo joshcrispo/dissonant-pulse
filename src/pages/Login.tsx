@@ -6,53 +6,56 @@ import { UserContext } from '../context/UserContext';
 import { auth } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import eye icons
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
     const navigate = useNavigate();
-    const { setUser } = useContext(UserContext); // Access setUser from UserContext
+    const { setUser } = useContext(UserContext);
 
     const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
         e.preventDefault();
+        setError('');
+
         try {
             // Authenticate the user with email and password
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const currentUser = userCredential.user;
-    
-            // Log the UID and path
-            console.log("UID:", currentUser.uid);
-            console.log("Document path:", `users/${currentUser.uid}`);
-    
-            // Query the Firestore collection for the user with the matching email
+
+            // Query the Firestore collection for the user with the matching UID
             const userRef = doc(db, 'users', currentUser.uid);
             const userDoc = await getDoc(userRef);
-    
+
             // Check if the document exists
             if (userDoc.exists()) {
                 const userData = userDoc.data();
                 const userRole = userData.role;
-    
+
                 console.log('User role:', userRole);
                 console.log('Login successful');
-    
+
                 // Update the global user context
                 setUser({
                     uid: currentUser.uid,
                     email: currentUser.email || '',
                     username: userData.username || 'Anonymous',
                 });
-    
+
                 // Redirect to the home page after successful login
-                navigate('/'); // Change the path to your home page route
+                navigate('/');
             } else {
-                console.error('User not found in Firestore');
+                setError('User not found in Firestore');
             }
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error('Login failed:', error.message);
+                setError('Invalid email or password');
             } else {
                 console.error('An unexpected error occurred');
+                setError('An unexpected error occurred');
             }
         }
     };
@@ -65,10 +68,12 @@ const Login: React.FC = () => {
             <div className="bg-black p-8 border-2 border-white w-1/2 max-w-lg">
                 <h1 className="text-4xl font-bold text-white mb-6 text-center">Login</h1>
                 
+                {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+                
                 <div className="mb-4">
                     <label className="block text-white mb-2" htmlFor="email">Email</label>
                     <input
-                        type="email"
+                        type="text"
                         id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -77,16 +82,23 @@ const Login: React.FC = () => {
                     />
                 </div>
                 
-                <div className="mb-6">
+                <div className="mb-6 relative">
                     <label className="block text-white mb-2" htmlFor="password">Password</label>
                     <input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full p-2 border border-white bg-black text-white focus:outline-none focus:border-red-500"
                         placeholder="Enter your password"
                     />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2 top-2 text-white"
+                    >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
                 </div>
 
                 <button

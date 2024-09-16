@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
+import { useNavigate } from 'react-router-dom';
+import { slugify } from '../utils';
+
 
 type Event = {
     id: string;
@@ -16,6 +19,13 @@ type Event = {
 
 const Events: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
+
+    const navigate = useNavigate();
+
+    const handleViewEvent = (eventName: string) => {
+        const slug = slugify(eventName)
+        navigate(`/event/${slug}`);
+    };
 
     const fetchEvents = async () => {
         const eventsCollection = collection(db, 'events');
@@ -64,7 +74,7 @@ const Events: React.FC = () => {
                                         <p className="text-2xl font-bold mb-1">{event.artists.join(', ')}</p>
                                         <p className="font-bold mb-1">{event.club}, {event.location}</p>
                                         <p className="mb-1">{startTime} - {endTime}</p>
-                                        <button className="bg-black text-white border border-gray-600 text-2xl p-2 mt-6 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105" onClick={() => console.log(`View event ${event.id}`)}>View Event</button>
+                                        <button className="bg-black text-white border border-gray-600 text-2xl p-2 mt-6 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105" onClick={() => handleViewEvent(event.eventName)}>View Event</button>
                                     </div>
                                 </div>
                             </div>

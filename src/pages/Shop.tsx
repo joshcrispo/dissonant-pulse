@@ -2,7 +2,7 @@ import React from 'react';
 import DissonantPulseLogo from '../assets/DP.png'
 import { Helmet } from 'react-helmet';
 
-const About: React.FC = () => {
+const Shop: React.FC = () => {
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center">
             <Helmet>
@@ -16,4 +16,4 @@ const About: React.FC = () => {
     );
 };
 
-export default About;
+export default Shop;

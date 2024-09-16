@@ -56,9 +56,14 @@ const Admin: React.FC = () => {
                 bio: data.bio,
                 artistImages: data.artistImages || [],
             };
-        }).sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
-        setEvents(eventsList);
-    };
+        });
+    
+        // Filter out past events
+        const currentDate = new Date();
+        const futureEvents = eventsList.filter(event => event.startDate > currentDate);
+    
+        setEvents(futureEvents);
+    };    
 
     useEffect(() => {
         fetchEvents();
@@ -300,8 +305,10 @@ const Admin: React.FC = () => {
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center">
             <h1 className="text-4xl font-bold mb-4">Admin Page</h1>
-            <button className="bg-black text-white p-2 border border-white rounded mb-4" onClick={() => setShowModal(true)}><FaPlus /></button>
-                {showModal && (
+            <button className="bg-black text-white p-2 border border-white rounded mb-4" onClick={() => setShowModal(true)}>
+                <FaPlus />
+            </button>
+            {showModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-black text-white p-6 border border-gray-600 shadow-lg relative w-3/4 max-h-[80vh] overflow-y-auto">
                         <span className="absolute top-2 right-2 text-xl cursor-pointer" onClick={handleCloseModal}>×</span>
@@ -341,12 +348,14 @@ const Admin: React.FC = () => {
                                 )}
                             </div>
                         ))}
-                        <button className="bg-black text-white p-2 border border-gray-600 rounded mb-2" onClick={handleAddArtist}><FaPlus /> Add Artist</button>
+                        <button className="bg-black text-white p-2 border border-gray-600 rounded mb-2" onClick={handleAddArtist}>
+                            <FaPlus /> Add Artist
+                        </button>
                         <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="datetime-local" value={startDate} onChange={(e) => setStartDate(e.target.value)} placeholder="Start Date" />
                         <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} placeholder="End Date" />
                         <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="text" value={club} onChange={(e) => setClub(e.target.value)} placeholder="Club" />
                         <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location (Street Name, Eircode)" />
-                        <textarea className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Event Bio" rows={10}></textarea>
+                        <textarea className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Event Bio"></textarea>
                         <label className="block mb-2">Event Image</label>
                         <button
                             className="bg-black text-white p-2 border border-gray-600 rounded mb-2"
@@ -402,6 +411,6 @@ const Admin: React.FC = () => {
             </div>
         </div>
     );
-};
+};    
 
 export default Admin;

@@ -344,9 +344,9 @@ const Admin: React.FC = () => {
                         <button className="bg-black text-white p-2 border border-gray-600 rounded mb-2" onClick={handleAddArtist}><FaPlus /> Add Artist</button>
                         <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="datetime-local" value={startDate} onChange={(e) => setStartDate(e.target.value)} placeholder="Start Date" />
                         <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} placeholder="End Date" />
-                        <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location (Street Name, Eircode)" />
                         <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="text" value={club} onChange={(e) => setClub(e.target.value)} placeholder="Club" />
-                        <textarea className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Event Bio"></textarea>
+                        <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location (Street Name, Eircode)" />
+                        <textarea className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Event Bio" rows={10}></textarea>
                         <label className="block mb-2">Event Image</label>
                         <button
                             className="bg-black text-white p-2 border border-gray-600 rounded mb-2"

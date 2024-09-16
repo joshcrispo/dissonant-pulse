@@ -43,8 +43,12 @@ const Events: React.FC = () => {
                 club: data.club,
             };
         });
-        setEvents(eventsList);
+    
+        const sortedEvents = eventsList.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+    
+        setEvents(sortedEvents);
     };
+    
 
     useEffect(() => {
         fetchEvents();
@@ -55,26 +59,38 @@ const Events: React.FC = () => {
             <Helmet>
                 <title>Dissonant Pulse - Events</title>
             </Helmet>
-            <section className="mx-auto text-center w-4/5 max-w-4xl">
+            <section className="mx-auto text-center w-9/12 max-w-9xl">
                 <h1 className="my-16 text-4xl font-bold">Upcoming Events</h1>
-                <div className="space-y-4 w-full">
+                <div className="w-full">
                     {events.map(event => {
                         // Formatting start and end times
                         const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
                         const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
                         
                         return (
-                            <div key={event.id} className="flex bg-black text-white shadow-lg mb-6" style={{ height: '50vh' }}>
+                            <div
+                                key={event.id}
+                                className="bg-black text-white shadow-lg mb-6 flex flex-col sm:flex-row gap-y-0 sm:gap-8"
+                            >
                                 {event.photoURL && (
-                                    <img src={event.photoURL} alt={`${event.eventName} cover`} className="w-2/5 h-4/5 object-cover mr-10" />
+                                    <img
+                                        src={event.photoURL}
+                                        alt={`${event.eventName} cover`}
+                                        className="w-full sm:w-1/2 h-64 object-cover mb-4 sm:mb-0"
+                                    />
                                 )}
-                                <div className="text-start flex-1 w-3/5 flex flex-col justify-between">
+                                <div className="text-start flex-1 w-full sm:w-1/2 flex flex-col justify-between">
                                     <div>
-                                        <h2 className="text-4xl font-bold mb-2">{event.eventName}</h2>
-                                        <p className="text-2xl font-bold mb-1">{event.artists.join(', ')}</p>
+                                        <h2 className="text-3xl sm:text-4xl font-bold mb-2">{event.eventName}</h2>
+                                        <p className="text-xl sm:text-2xl font-bold mb-1">{event.artists.join(', ')}</p>
                                         <p className="font-bold mb-1">{event.club}, {event.location}</p>
                                         <p className="mb-1">{startTime} - {endTime}</p>
-                                        <button className="bg-black text-white border border-gray-600 text-2xl p-2 mt-6 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105" onClick={() => handleViewEvent(event.eventName)}>View Event</button>
+                                        <button
+                                            className="bg-black text-white border border-gray-600 text-xl sm:text-2xl p-2 mt-6 w-full sm:w-auto hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
+                                            onClick={() => handleViewEvent(event.eventName)}
+                                        >
+                                            View Event
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -83,7 +99,7 @@ const Events: React.FC = () => {
                 </div>
             </section>
         </div>
-    );
+    );    
 };
 
 export default Events;

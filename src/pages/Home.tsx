@@ -7,8 +7,8 @@ const Home: React.FC = () => {
             <Helmet>
                 <title>Dissonant Pulse - Home</title>
             </Helmet>
-            <h1 className="mt-40 text-4xl font-bold">Welcome to Dissonant Pulse</h1>
-            <p className="text-lg mt-4">Experience the latest and greatest in underground techno.</p>
+            <h1 className="mx-auto my-16 text-4xl font-bold">Welcome to Dissonant Pulse</h1>
+            <p className="text-lg">Experience the latest and greatest in underground techno.</p>
 
             <section className="mt-16 mx-auto text-center max-w-3xl">
                 <h2 className="mt-24 text-2xl font-semibold">Upcoming Events</h2>

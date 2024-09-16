@@ -7,6 +7,7 @@ import About from './pages/About';
 import Login from './pages/Login';
 import Admin from './pages/Admin';
 import Signup from './pages/Signup';
+import Shop from './pages/Shop';
 
 import Navbar from './components/Navbar';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
@@ -34,6 +35,7 @@ const Main: React.FC = () => {
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/shop" element={<Shop />} />
           <Route
             path="/admin"
             element={

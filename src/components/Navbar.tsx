@@ -30,17 +30,22 @@ const Navbar: React.FC = () => {
                 <ul className="mr-16 flex space-x-8">
                     <li>
                         <Link to="/" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 border-2 border-gray-600 px-6 py-2 text-center block">
-                            Home
+                            HOME
                         </Link>
                     </li>
                     <li>
                         <Link to="/events" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 border-2 border-gray-600 px-6 py-2 text-center block">
-                            Events
+                            EVENTS
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/shop" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 border-2 border-gray-600 px-6 py-2 text-center block">
+                            SHOP
                         </Link>
                     </li>
                     <li>
                         <Link to="/about" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 border-2 border-gray-600 px-6 py-2 text-center block">
-                            About
+                            ABOUT
                         </Link>
                     </li>
                     <li>

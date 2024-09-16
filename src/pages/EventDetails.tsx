@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { slugify } from '../utils';
+import { Helmet } from 'react-helmet';
 
 type Event = {
     id: string;
@@ -72,6 +73,9 @@ const EventDetail: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center">
+            <Helmet>
+                <title>Dissonant Pulse - { event.eventName }</title>
+            </Helmet>
             <div className="container mx-auto w-4/5 max-w-4xl my-16 grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-center">
                 <img src={event.photoURL} alt={event.eventName} className="w-auto h-96 object-cover" />
                 <div className="flex flex-col justify-center">

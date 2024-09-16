@@ -64,11 +64,11 @@ const Events: React.FC = () => {
                         const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
                         
                         return (
-                            <div key={event.id} className="flex bg-black text-white shadow-lg" style={{ height: '42vh' }}>
+                            <div key={event.id} className="flex bg-black text-white shadow-lg mb-6" style={{ height: '50vh' }}>
                                 {event.photoURL && (
-                                    <img src={event.photoURL} alt={`${event.eventName} cover`} className="w-3/5 h-4/5 object-cover mr-10" />
+                                    <img src={event.photoURL} alt={`${event.eventName} cover`} className="w-2/5 h-4/5 object-cover mr-10" />
                                 )}
-                                <div className="text-start flex-1 w-2/5 flex flex-col justify-between">
+                                <div className="text-start flex-1 w-3/5 flex flex-col justify-between">
                                     <div>
                                         <h2 className="text-4xl font-bold mb-2">{event.eventName}</h2>
                                         <p className="text-2xl font-bold mb-1">{event.artists.join(', ')}</p>

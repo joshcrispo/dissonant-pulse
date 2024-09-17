@@ -71,7 +71,7 @@ const Events: React.FC = () => {
                 <title>Dissonant Pulse - Events</title>
             </Helmet>
             <section className="mx-auto text-center w-9/12 max-w-9xl">
-                <h1 className="my-16 text-4xl font-bold">Upcoming Events</h1>
+                <h1 className="my-16 text-4xl font-bold">UPCOMING EVENTS</h1>
                 <div className="w-full">
                     {events.upcoming.map(event => {
                         // Formatting start and end times

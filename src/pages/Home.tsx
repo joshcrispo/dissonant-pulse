@@ -81,7 +81,7 @@ const Home: React.FC = () => {
                         <PerspectiveCamera makeDefault position={[0, -100, 1000]} fov={55} />
                     </Canvas>
                 </div>
-                <h1 className="mx-auto mb-8 text-6xl font-bold">DISSONANT PULSE</h1>
+                <h1 className="mx-auto mb-8 lg:text-6xl text-5xl font-bold">DISSONANT PULSE</h1>
                 <p className="text-lg">Experience the latest and greatest in underground techno.</p>
                 
                {/* Upcoming Events Section */}

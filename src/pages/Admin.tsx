@@ -9,6 +9,14 @@ import {
     uploadBytes,
 } from "firebase/storage";
 
+type ShopItem = {
+    id: string;
+    shopItemName: string;
+    shopItemDescription: string;
+    shopItemPrice: number;
+    shopItemImageUrl: string;
+};
+
 type Event = {
     id: string;
     eventName: string;
@@ -38,6 +46,18 @@ const Admin: React.FC = () => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);  
     const [artistImages, setArtistImages] = useState<(File | null)[]>([]);
     const [artistImagePreviews, setArtistImagePreviews] = useState<string[]>([]);
+
+    // Shop
+    const [shopItems, setShopItems] = useState<ShopItem[]>([]);
+    const [showShopModal, setShowShopModal] = useState(false);
+    const [shopItemName, setShopItemName] = useState('');
+    const [shopItemDescription, setShopItemDescription] = useState('');
+    const [shopItemPrice, setShopItemPrice] = useState('');
+    const [shopItemImage, setShopItemImage] = useState<File | null>(null);
+    const [shopItemImagePreview, setShopItemImagePreview] = useState<string | null>(null);
+    const [editingShopItem, setEditingShopItem] = useState<any>(null);  // Replace `any` with the correct type for shop items.
+
+
 
     const fetchEvents = async () => {
         const eventsCollection = collection(db, 'events');
@@ -301,13 +321,128 @@ const Admin: React.FC = () => {
     const handleCloseModal = () => {
         clearForm();
     };
+
+    // Shop
+
+    const fetchShopItems = async () => {
+        try {
+            const shopItemsCollection = collection(db, 'shop_items');
+            const shopItemsSnapshot = await getDocs(shopItemsCollection);
+            const shopItemsList = shopItemsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+            })) as ShopItem[];
+            setShopItems(shopItemsList);
+        } catch (error) {
+            console.error('Error fetching shop items:', error);
+            setError('Failed to fetch shop items.');
+        }
+    };
+
+    useEffect(() => {
+        fetchShopItems();
+        console.log(shopItems);
+    }, [shopItems]);
+    
+
+    const handleAddShopItem = async () => {
+        if (!shopItemName || !shopItemDescription || !shopItemPrice) {
+            setError('Please fill in all shop fields.');
+            return;
+        }
+    
+        try {
+            let shopItemImageUrl = '';
+            if (shopItemImage) {
+                shopItemImageUrl = await uploadShopItemImage();
+            }
+    
+            const shopItemsCollection = collection(db, 'shop_items');
+            await addDoc(shopItemsCollection, {
+                shopItemName,
+                shopItemDescription,
+                shopItemPrice,
+                shopItemImageUrl,
+                createdAt: new Date(),
+            });
+    
+            clearShopForm();
+            fetchShopItems();
+        } catch (error) {
+            console.error('Error adding shop item:', error);
+            setError('Failed to add shop item.');
+        }
+    };    
+    
+    const uploadShopItemImage = async () => {
+        if (!shopItemImage) return '';
+    
+        const imageRef = storageRef(storage, `shop_items/${uuid()}`);
+        await uploadBytes(imageRef, shopItemImage);
+        return await getDownloadURL(imageRef);
+    };
+
+    const handleShopImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setShopItemImage(file);
+            setShopItemImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleEditShopItem = (shopItem: any) => {
+        setEditingShopItem(shopItem);
+        setShopItemName(shopItem.shopItemName);
+        setShopItemDescription(shopItem.shopItemDescription);
+        setShopItemPrice(shopItem.shopItemPrice);
+        setShopItemImagePreview(shopItem.shopItemImageUrl || null); // Show existing image if available
+        setShowShopModal(true);
+    };
+
+    const handleDeleteShopItem = async (id: string) => {
+        try {
+            await deleteDoc(doc(db, 'shop_items', id));
+            fetchShopItems();  // Refresh the list after deletion
+        } catch (error) {
+            console.error('Error deleting shop item:', error);
+            setError('Failed to delete shop item.');
+        }
+    };
+
+    const clearShopForm = () => {
+        setEditingShopItem(null);
+        setShopItemName('');
+        setShopItemDescription('');
+        setShopItemPrice('');
+        setShopItemImage(null);
+        setShopItemImagePreview(null);
+        setError('');
+        setShowShopModal(false);
+    };
+    
+    const handleShopCloseModal = () => {
+        clearShopForm();
+    };
+    
     
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center">
             <h1 className="text-4xl font-bold mb-4">Admin Page</h1>
-            <button className="bg-black text-white p-2 border border-white rounded mb-4" onClick={() => setShowModal(true)}>
-                <FaPlus />
-            </button>
+
+            <div className="flex space-x-4 mb-4 justify-center">
+                <div className="flex-1 flex items-center justify-center">
+                    <button className="bg-black text-white p-2 border border-white" onClick={() => setShowModal(true)}>
+                        + Add Event
+                    </button>
+                </div>
+                <div className="flex-1 flex items-center justify-center">
+                    <button className="bg-black text-white p-2 border border-white" onClick={() => setShowShopModal(true)}>
+                        + Add Shop Item
+                    </button>
+                </div>
+            </div>
+
+            
             {showModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-black text-white p-6 border border-gray-600 shadow-lg relative w-3/4 max-h-[80vh] overflow-y-auto">
@@ -337,7 +472,6 @@ const Admin: React.FC = () => {
                                 </button>
                                 {artistImagePreviews[index] && <img src={artistImagePreviews[index]} alt="Artist Preview" className="w-60 h-60 object-cover mt-2 mb-2" />}
                                 
-                                {/* Remove Artist Button */}
                                 {artists.length > 1 && (
                                     <button
                                         className="bg-black text-white p-2 border border-red-600 rounded mb-2"
@@ -370,13 +504,7 @@ const Admin: React.FC = () => {
                             accept="image/*"
                             onChange={handleImageChange}
                         />
-                        {imagePreview && (
-                            <img 
-                                src={imagePreview} 
-                                alt="Preview" 
-                                className="w-64 h-64 object-cover mt-2" 
-                            />
-                        )}
+                        {imagePreview && <img src={imagePreview} alt="Preview" className="w-64 h-64 object-cover mt-2" />}
                         <button className="bg-black text-white p-2 border border-white mt-2" onClick={editingEvent ? handleUpdateEvent : handleAddEvent}>
                             {editingEvent ? 'Update Event' : 'Add Event'}
                         </button>
@@ -384,30 +512,90 @@ const Admin: React.FC = () => {
                     </div>
                 </div>
             )}
-            <div className="space-y-4 w-full max-w-4xl">
-                {events.map(event => {
-                    // Formatting start and end times
-                    const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-                    const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-                    
-                    return (
-                        <div key={event.id} className="flex items-center bg-black text-white p-4 border border-gray-600 shadow-lg">
-                            {event.photoURL && (
-                                <img src={event.photoURL} alt={`${event.eventName} cover`} className="w-32 h-32 object-cover mr-4" />
-                            )}
-                            <div className="flex-1">
-                                <h2 className="text-2xl font-bold mb-2">{event.eventName}</h2>
-                                <p className="font-bold mb-1">{event.artists.join(', ')}</p>
-                                <p className="font-bold mb-1">{event.club}, {event.location}</p>
-                                <p className="mb-1">{startTime} - {endTime}</p>
-                                <div className="flex space-x-2 mt-2">
-                                    <button className="bg-black text-white p-2" onClick={() => handleEditEvent(event)}><FaEdit /></button>
-                                    <button className="bg-black text-white p-2" onClick={() => handleDeleteEvent(event.id)}><FaTrash /></button>
+            
+            {showShopModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-black text-white p-6 border border-gray-600 shadow-lg relative w-3/4 max-h-[80vh] overflow-y-auto">
+                        <span className="absolute top-2 right-2 text-xl cursor-pointer" onClick={handleShopCloseModal}>×</span>
+                        <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="text" value={shopItemName} onChange={(e) => setShopItemName(e.target.value)} placeholder="Item Name" />
+                        <textarea className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" value={shopItemDescription} onChange={(e) => setShopItemDescription(e.target.value)} placeholder="Item Description"></textarea>
+                        <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="number" value={shopItemPrice} onChange={(e) => setShopItemPrice(e.target.value)} placeholder="Price" />
+                        <label className="block mb-2">Item Image</label>
+                        <button className="bg-black text-white p-2 border border-gray-600 rounded mb-2" onClick={() => document.getElementById('shopFileInput')?.click()}>
+                            {shopItemImagePreview ? 'Change Photo' : 'Add Photo'}
+                        </button>
+                        <input type="file" id="shopFileInput" className="hidden" accept="image/*" onChange={handleShopImageChange} />
+                        {shopItemImagePreview && <img src={shopItemImagePreview} alt="Item Preview" className="w-64 h-64 object-cover mt-2" />}
+                        <button className="bg-black text-white p-2 border border-white mt-2" onClick={handleAddShopItem}>
+                            Add Shop Item
+                        </button>
+                    </div>
+                </div>
+            )}
+    
+            {/* Display Events */}
+            <div className="flex w-full max-w-7xl mx-auto space-x-4">
+                {/* Left Column: Events */}
+                <div className="flex-1">
+                    <h2 className="text-3xl text-center font-bold mb-4">Events</h2>
+                    <div className="space-y-4 w-full max-w-4xl mb-4">
+                        {events.map(event => {
+                            const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                            const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                            
+                            return (
+                                <div key={event.id} className="flex items-center bg-black text-white p-4 border border-gray-600 shadow-lg">
+                                    {event.photoURL && (
+                                        <img src={event.photoURL} alt={`${event.eventName} cover`} className="w-32 h-32 object-cover mr-4" />
+                                    )}
+                                    <div className="flex-1">
+                                        <h2 className="text-2xl font-bold mb-2">{event.eventName}</h2>
+                                        <p className="font-bold mb-1">{event.artists.join(', ')}</p>
+                                        <p className="font-bold mb-1">{event.club}, {event.location}</p>
+                                        <p className="mb-1">{startTime} - {endTime}</p>
+                                        <div className="flex space-x-2 mt-2">
+                                            <button className="bg-black text-white p-2" onClick={() => handleEditEvent(event)}><FaEdit /></button>
+                                            <button className="bg-black text-white p-2" onClick={() => handleDeleteEvent(event.id)}><FaTrash /></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="w-px bg-gray-600"></div>
+            
+                {/* Display Shop Items */}
+                <div className="flex-1">
+                    <h2 className="text-3xl text-center font-bold mb-4">Shop Items</h2>
+                    <div className="space-y-4 w-full max-w-4xl mb-4">
+                        {shopItems.map(item => (
+                            <div key={item.id} className="flex items-center bg-black text-white p-4 border border-gray-600 shadow-lg">
+                                {/* Image */}
+                                {item.shopItemImageUrl && (  // Use shopItemImageUrl (lowercase 'u')
+                                    <img 
+                                        src={item.shopItemImageUrl}  // Use shopItemImageUrl (lowercase 'u')
+                                        alt={`${item.shopItemName} cover`} 
+                                        className="w-32 h-32 object-cover mr-4" 
+                                    />
+                                )}
+                                
+                                {/* Content */}
+                                <div className="flex-1">
+                                    <h2 className="text-2xl font-bold mb-2">{item.shopItemName}</h2>
+                                    <p className="mb-1">${item.shopItemPrice}</p>
+                                    
+                                    {/* Edit/Delete buttons */}
+                                    <div className="flex space-x-2 mt-2">
+                                        <button className="bg-black text-white p-2" onClick={() => handleEditShopItem(item)}><FaEdit /></button>
+                                        <button className="bg-black text-white p-2" onClick={() => handleDeleteShopItem(item.id)}><FaTrash /></button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );

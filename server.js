@@ -8,9 +8,12 @@ app.use(cors());
 app.use(express.json());
 
 app.post('/create-checkout-session', async (req, res) => {
-  const { name, price, imageUrl } = req.body; // Get item details from the request
+  const { name, price, imageUrl, type } = req.body; 
 
   try {
+    const successUrl = type === 'event' ? `http://localhost:3000/events/success?itemName=${encodeURIComponent(name)}&itemType=${type}` : `http://localhost:3000/shop/success?itemName=${encodeURIComponent(name)}&itemType=${type}`;
+    const cancelUrl = type === 'event' ? `http://localhost:3000/events/cancel?itemName=${encodeURIComponent(name)}&itemType=${type}` : `http://localhost:3000/shop/cancel?itemName=${encodeURIComponent(name)}&itemType=${type}`;
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -19,16 +22,16 @@ app.post('/create-checkout-session', async (req, res) => {
             currency: 'eur',
             product_data: {
               name: name,
-              images: [imageUrl], // Optional: Show the image on the checkout page
+              images: [imageUrl],
             },
-            unit_amount: Math.round(price * 100), // Stripe expects the price in cents
+            unit_amount: Math.round(price * 100),
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: 'http://localhost:3000/shop/success', // Redirect after successful payment
-      cancel_url: 'http://localhost:3000/shop/cancel',
+      success_url: successUrl, 
+      cancel_url: cancelUrl,
     });
     res.json({ id: session.id });
   } catch (error) {

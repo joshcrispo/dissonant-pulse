@@ -84,6 +84,7 @@ const EventDetail: React.FC = () => {
                 name: event.eventName,
                 price: event.ticketPrice,
                 imageUrl: event.photoURL,
+                type: 'event',
             }),
         });
 

@@ -67,6 +67,7 @@ const ShopItemDetail: React.FC = () => {
                 name: shopItem.name,
                 price: shopItem.price,
                 imageUrl: shopItem.imageUrl,
+                type: 'shop',
             }),
         });
 

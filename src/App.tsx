@@ -13,6 +13,7 @@ import EventDetail from './pages/EventDetails';
 import Navbar from './components/Navbar';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import { UserProvider } from './context/UserContext';
+import ShopItemDetail from './pages/ShopItemDetail';
 
 const App: React.FC = () => {
   return (
@@ -38,6 +39,7 @@ const Main: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/shop/:slug" element={<ShopItemDetail />} />
           <Route
             path="/admin"
             element={

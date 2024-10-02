@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
+import { useNavigate } from 'react-router-dom';
+import { slugify } from '../utils';
 
 type ShopItem = {
     id: string;
@@ -13,6 +15,7 @@ type ShopItem = {
 const Shop: React.FC = () => {
     const [shopItems, setShopItems] = useState<ShopItem[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const fetchShopItems = async () => {
         try {
@@ -32,6 +35,11 @@ const Shop: React.FC = () => {
             console.error('Error fetching shop items:', error);
             setError('Failed to fetch shop items. Please check your permissions or network connection.');
         }
+    };
+
+    const handleViewItem = (itemName: string) => {
+        const slug = slugify(itemName);
+        navigate(`/shop/${slug}`);
     };
     
     useEffect(() => {
@@ -69,7 +77,7 @@ const Shop: React.FC = () => {
                                 )}
                                 <button
                                     className="bg-black border border-gray-600 text-white p-2 mt-4 w-full hover:bg-gray-800 transition duration-300"
-                                    onClick={() => console.log(`View item: ${item.name}`)}
+                                    onClick={() => handleViewItem(item.name)}
                                 >
                                     View Item
                                 </button>

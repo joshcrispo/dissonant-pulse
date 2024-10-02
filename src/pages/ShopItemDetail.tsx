@@ -4,6 +4,10 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { slugify } from '../utils';
 import { Helmet } from 'react-helmet';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe('pk_test_51Q5GPFFokBZMd6H1Y5gRZRjgxymtpkidvkXawPrY9nGgibQMEFDM71WTZWyUjqU2Q9dxVsGfalEYI29Ahpg7qnxN006lFJR48h');
+
 
 type ShopItem = {
     id: string;
@@ -50,6 +54,31 @@ const ShopItemDetail: React.FC = () => {
         fetchShopItems();
     }, [slug, navigate]);
 
+    const handleBuyItem = async () => {
+        if (!shopItem) return;
+
+        const stripe = await stripePromise;
+        const response = await fetch('http://localhost:4242/create-checkout-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: shopItem.name,
+                price: shopItem.price,
+                imageUrl: shopItem.imageUrl,
+            }),
+        });
+
+        const session = await response.json();
+
+        // Redirect to Stripe Checkout
+        const { error } = await stripe!.redirectToCheckout({ sessionId: session.id });
+        if (error) {
+            console.error('Stripe checkout error:', error.message);
+        }
+    };
+
     if (!shopItem) {
         return <div>Loading...</div>;
     }
@@ -67,7 +96,7 @@ const ShopItemDetail: React.FC = () => {
                     <p className="text-xl mb-2">{shopItem.shopItemDescription || 'No description available'}</p>
                     <button
                         className="bg-black text-white border border-gray-600 text-2xl p-2 mt-6 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
-                        onClick={() => console.log(`Buy item: ${shopItem.name}`)}
+                        onClick={handleBuyItem}
                     >
                         Buy Item
                     </button>

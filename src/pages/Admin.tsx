@@ -28,6 +28,7 @@ type Event = {
     club?: string;
     bio?: string;
     artistImages?: (string | null)[];
+    ticketPrice?: number;
 };
 
 const Admin: React.FC = () => {
@@ -46,6 +47,7 @@ const Admin: React.FC = () => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);  
     const [artistImages, setArtistImages] = useState<(File | null)[]>([]);
     const [artistImagePreviews, setArtistImagePreviews] = useState<string[]>([]);
+    const [ticketPrice, setTicketPrice] = useState<number | ''>('');
 
     // Shop
     const [shopItems, setShopItems] = useState<ShopItem[]>([]);
@@ -75,6 +77,7 @@ const Admin: React.FC = () => {
                 club: data.club,
                 bio: data.bio,
                 artistImages: data.artistImages || [],
+                ticketPrice: data.ticketPrice || 0, 
             };
         });
     
@@ -139,6 +142,7 @@ const Admin: React.FC = () => {
         setLocation(event.location || '');
         setClub(event.club || '');
         setBio(event.bio || '');
+        setTicketPrice(event.ticketPrice !== undefined ? event.ticketPrice : ""); 
         setImagePreview(event.photoURL || null); // Show existing image if available
     
         // Handle artist images: If any image is null, replace with empty string for the preview
@@ -194,7 +198,7 @@ const Admin: React.FC = () => {
      
     
     const handleAddEvent = async () => {
-        if (!eventName || !artists.length || !startDate || !endDate || !location || !club || !bio) {
+        if (!eventName || !artists.length || !startDate || !endDate || !location || !club || !bio || ticketPrice === '') {
             setError('Please fill in all fields.');
             return;
         }
@@ -218,10 +222,10 @@ const Admin: React.FC = () => {
                 club,
                 bio,
                 artistImages: artistImageUrls,
+                ticketPrice: Number(ticketPrice),
                 createdAt: new Date(),
             });
     
-            // Clear the form and close the modal
             clearForm();
             fetchEvents(); 
         } catch (error) {
@@ -230,8 +234,9 @@ const Admin: React.FC = () => {
         }
     };
     
+    
     const handleUpdateEvent = async () => {
-        if (!eventName || !artists.length || !startDate || !endDate || !location || !club || !bio) {
+        if (!eventName || !artists.length || !startDate || !endDate || !location || !club || !bio || ticketPrice === '') {
             setError('Please fill in all fields.');
             return;
         }
@@ -273,6 +278,7 @@ const Admin: React.FC = () => {
                 bio,
                 photoURL,
                 artistImages: artistImageUrls,
+                ticketPrice: Number(ticketPrice),
             });
     
             // Update the local state
@@ -289,6 +295,7 @@ const Admin: React.FC = () => {
                         bio,
                         photoURL,
                         artistImages: artistImageUrls,
+                        ticketPrice: Number(ticketPrice),
                     }
                     : event
             ));
@@ -315,6 +322,7 @@ const Admin: React.FC = () => {
         setArtistImages([]);
         setArtistImagePreviews([]);
         setError('');
+        setTicketPrice('');
         setShowModal(false);
     };
 
@@ -490,6 +498,7 @@ const Admin: React.FC = () => {
                         <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="text" value={club} onChange={(e) => setClub(e.target.value)} placeholder="Club" />
                         <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location (Street Name, Eircode)" />
                         <textarea className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Event Bio"></textarea>
+                        <input className="bg-black border border-gray-600 p-2 mb-2 w-full text-white" type="number" value={ticketPrice} onChange={(e) => setTicketPrice(Number(e.target.value))} placeholder="Ticket Price (€)" />
                         <label className="block mb-2">Event Image</label>
                         <button
                             className="bg-black text-white p-2 border border-gray-600 rounded mb-2"
@@ -553,6 +562,7 @@ const Admin: React.FC = () => {
                                         <p className="font-bold mb-1">{event.artists.join(', ')}</p>
                                         <p className="font-bold mb-1">{event.club}, {event.location}</p>
                                         <p className="mb-1">{startTime} - {endTime}</p>
+                                        <p className="mb-1">Ticket Price: €{event.ticketPrice}</p> 
                                         <div className="flex space-x-2 mt-2">
                                             <button className="bg-black text-white p-2" onClick={() => handleEditEvent(event)}><FaEdit /></button>
                                             <button className="bg-black text-white p-2" onClick={() => handleDeleteEvent(event.id)}><FaTrash /></button>

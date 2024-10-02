@@ -4,6 +4,9 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { slugify } from '../utils';
 import { Helmet } from 'react-helmet';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe('pk_test_51Q5GPFFokBZMd6H1Y5gRZRjgxymtpkidvkXawPrY9nGgibQMEFDM71WTZWyUjqU2Q9dxVsGfalEYI29Ahpg7qnxN006lFJR48h');
 
 type Event = {
     id: string;
@@ -16,6 +19,7 @@ type Event = {
     club?: string;
     bio?: string;
     artistImages?: string[];
+    ticketPrice?: number;
 };
 
 const EventDetail: React.FC = () => {
@@ -45,6 +49,7 @@ const EventDetail: React.FC = () => {
                     club: data.club,
                     bio: data.bio,
                     artistImages: data.artistImages,
+                    ticketPrice: data.ticketPrice,
                 };
             });
 
@@ -63,6 +68,38 @@ const EventDetail: React.FC = () => {
     if (!event) {
         return <div>Loading...</div>;
     }
+
+    const handleBuyItem = async () => {
+        if (!event) return;
+
+        console.log('Event details:', event); // Debug: Check the event data
+
+        const stripe = await stripePromise;
+        const response = await fetch('http://localhost:4242/create-checkout-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: event.eventName,
+                price: event.ticketPrice,
+                imageUrl: event.photoURL,
+            }),
+        });
+
+        const session = await response.json();
+
+        // Redirect to Stripe Checkout
+        const { error } = await stripe!.redirectToCheckout({ sessionId: session.id });
+        if (error) {
+            console.error('Stripe checkout error:', error.message);
+        }
+    };
+
+    if (!event) {
+        return <div>Loading...</div>;
+    }
+
 
     // Formatting start and end times
     const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
@@ -84,7 +121,12 @@ const EventDetail: React.FC = () => {
                     <p className="text-xl mb-2">{event.club} - {event.location}
                     </p>
                     <p className="text-xl mb-2">{startTime} - {endTime}</p>
-                    <button className="bg-black text-white border border-gray-600 text-2xl p-2 mt-6 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105">Buy Ticket</button>
+                    <button 
+                        className="bg-black text-white border border-gray-600 text-2xl p-2 mt-6 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
+                        onClick={handleBuyItem}
+                    >
+                        Buy Ticket - €{event.ticketPrice}
+                    </button>
                 </div>
             </div>
             {event.bio && (

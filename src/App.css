@@ -62,3 +62,19 @@
 .pulse-animation {
   animation: pulse 1s infinite;
 }
+
+.about-section {
+  opacity: 0; /* Start hidden */
+  transition: opacity 0.5s ease-in-out; /* Animation for the reveal */
+}
+
+.about-section.fade-in-active {
+  opacity: 1; /* Fully visible when in view */
+}
+
+/* Remove the hidden class */
+.about-section.hidden {
+  /* Instead of display: none, we can set visibility or keep it for alternative usage */
+  visibility: hidden; /* Ensure hidden sections are not visible, but still occupy space */
+  opacity: 0; /* Make sure opacity is set to 0 */
+}

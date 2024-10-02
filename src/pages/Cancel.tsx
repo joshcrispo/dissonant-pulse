@@ -12,13 +12,6 @@ const Cancel: React.FC = () => {
     const itemType = location.state?.itemType || searchParams.get('itemType') || 'event';
     const itemName = location.state?.itemName || searchParams.get('itemName') || '';
 
-        // Debugging logs to see what values are being read
-        console.log('Location state:', location.state);
-        console.log('Item Type from state:', location.state?.itemType);
-        console.log('Item Type from query params:', searchParams.get('itemType'));
-        console.log('Item Name from state:', location.state?.itemName);
-        console.log('Item Name from query params:', searchParams.get('itemName'));
-
     const handleGoBack = () => {
         if (itemType === 'event') {
         navigate('/events');

@@ -30,12 +30,14 @@ const Success: React.FC = () => {
                 <p className="text-2xl text-center mb-10">
                     You have successfully purchased {itemType === 'event' ? 'a ticket for' : ''} <span className="font-bold">{itemName}</span>.
                 </p>
-                <button
-                    className="items-center bg-black text-white border border-gray-600 text-xl sm:text-2xl p-2 mt-6 w-full sm:w-auto hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
-                    onClick={handleGoBack}
-                >
-                    ← Back to {itemType === 'event' ? 'Events' : 'Shop'}
-                </button>
+                <div className="flex justify-center">
+                    <button
+                        className="bg-black text-white border border-gray-600 text-xl sm:text-2xl p-2 mt-6 w-full sm:w-auto hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
+                        onClick={handleGoBack}
+                    >
+                        ← Back to {itemType === 'event' ? 'Events' : 'Shop'}
+                    </button>
+                </div>
             </div>
         </div>
     );

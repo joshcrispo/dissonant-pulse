@@ -2,21 +2,14 @@ import React, { useRef, useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import DissonantPulseLogo from '../assets/DP.png';
 import { Bars3Icon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
-import LoginModal from './LoginModal';
 import { UserContext } from '../context/UserContext';
 import { auth } from '../firebase';
 
 
 const Navbar: React.FC = () => {
     const { user, loading, setUser } = useContext(UserContext);
-    const [isModalVisible, setIsModalVisible] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-    const buttonRef = useRef<HTMLButtonElement>(null);
-
-    const handleModalClose = () => {
-        setIsModalVisible(false);
-    };
 
     const handleMenuToggle = () => {
         setIsMenuOpen(prev => !prev);
@@ -89,7 +82,6 @@ const Navbar: React.FC = () => {
                                     {!user ? (
                                         <Link
                                             to="/login"
-                                            onClick={() => setIsModalVisible(true)}
                                             className="block px-4 py-2 text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
                                         >
                                             LOGIN
@@ -178,7 +170,6 @@ const Navbar: React.FC = () => {
                                 <Link
                                     to="/login"
                                     className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-6 py-2 text-center block focus:outline-none"
-                                    onClick={() => setIsModalVisible(true)}
                                 >
                                     LOGIN
                                 </Link>
@@ -224,7 +215,6 @@ const Navbar: React.FC = () => {
                                     )}
                                 </div>
                             )}
-                            {isModalVisible && <LoginModal onClose={handleModalClose} buttonRef={buttonRef} />}
                         </li>
                     </div>
                 </div>

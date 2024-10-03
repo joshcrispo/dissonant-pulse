@@ -25,16 +25,18 @@ const Success: React.FC = () => {
                 <title>{`Thank You - ${itemName}`}</title>
             </Helmet>
             <div className='mt-48 flex items-center'></div>
-            <h1 className="text-4xl font-bold mb-6">Thank you for your purchase!</h1>
-            <p className="text-2xl mb-10">
-                You have successfully purchased {itemType === 'event' ? 'a ticket for' : ''} <span className="font-bold">{itemName}</span>.
-            </p>
-            <button
-                className="bg-black text-white border border-gray-600 text-xl sm:text-2xl p-2 mt-6 w-full sm:w-auto hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
-                onClick={handleGoBack}
-            >
-                ← Back to {itemType === 'event' ? 'Events' : 'Shop'}
-            </button>
+            <div className='w-9/12 max-w-9xl'>
+                <h1 className="text-4xl text-center font-bold mb-6">Thank you for your purchase!</h1>
+                <p className="text-2xl text-center mb-10">
+                    You have successfully purchased {itemType === 'event' ? 'a ticket for' : ''} <span className="font-bold">{itemName}</span>.
+                </p>
+                <button
+                    className="items-center bg-black text-white border border-gray-600 text-xl sm:text-2xl p-2 mt-6 w-full sm:w-auto hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
+                    onClick={handleGoBack}
+                >
+                    ← Back to {itemType === 'event' ? 'Events' : 'Shop'}
+                </button>
+            </div>
         </div>
     );
 };

@@ -78,3 +78,35 @@
   visibility: hidden; /* Ensure hidden sections are not visible, but still occupy space */
   opacity: 0; /* Make sure opacity is set to 0 */
 }
+
+/* Define keyframes for dropdown enter and exit animations */
+@keyframes dropdown-enter {
+  from {
+      opacity: 0;
+      transform: translateY(-10px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+@keyframes dropdown-exit {
+  from {
+      opacity: 1;
+      transform: translateY(0);
+  }
+  to {
+      opacity: 0;
+      transform: translateY(-10px);
+  }
+}
+
+/* Apply the animations to the dropdown */
+.dropdown-enter {
+  animation: dropdown-enter 0.3s ease forwards;
+}
+
+.dropdown-exit {
+  animation: dropdown-exit 0.3s ease forwards;
+}

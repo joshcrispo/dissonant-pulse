@@ -71,7 +71,7 @@ const Home: React.FC = () => {
             </Helmet>
             <div className='mx-auto text-center w-9/12 max-w-9xl'>
                 {/* 3D Section */}
-                <div className="w-full h-96 mt-16">
+                <div className="w-full h-96 mt-8">
                     <Canvas style={{ background: 'transparent' }} gl={{ alpha: true }}>
                         <ambientLight />
                         <pointLight position={[10, 10, 10]} />

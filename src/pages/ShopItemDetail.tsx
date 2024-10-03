@@ -58,7 +58,7 @@ const ShopItemDetail: React.FC = () => {
         if (!shopItem) return;
 
         const stripe = await stripePromise;
-        const response = await fetch('http://localhost:4242/create-checkout-session', {
+        const response = await fetch('http://192.168.0.107:4242/create-checkout-session', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

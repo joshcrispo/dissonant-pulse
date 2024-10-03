@@ -5,6 +5,7 @@ import { db } from '../firebase';
 import { slugify } from '../utils';
 import { Helmet } from 'react-helmet';
 import { loadStripe } from '@stripe/stripe-js';
+import { auth } from '../firebase'; // Make sure to import auth from your firebase configuration
 
 const stripePromise = loadStripe('pk_test_51Q5GPFFokBZMd6H1Y5gRZRjgxymtpkidvkXawPrY9nGgibQMEFDM71WTZWyUjqU2Q9dxVsGfalEYI29Ahpg7qnxN006lFJR48h');
 
@@ -25,11 +26,21 @@ type Event = {
 const EventDetail: React.FC = () => {
     const { title } = useParams<{ title: string }>();
     const [event, setEvent] = useState<Event | null>(null);
+    const [user, setUser] = useState<any>(null); // User state
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Get the currently logged in user
+        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+            setUser(currentUser); // Update the user state
+        });
+
+        return () => unsubscribe(); // Cleanup on unmount
+    }, []);
+
+    useEffect(() => {
         if (!title) {
-            navigate('/events'); // Redirect to events page if title is undefined
+            navigate('/events'); // Redirect if title is undefined
             return;
         }
 
@@ -65,14 +76,8 @@ const EventDetail: React.FC = () => {
         fetchEvent();
     }, [title, navigate]);
 
-    if (!event) {
-        return <div>Loading...</div>;
-    }
-
     const handleBuyItem = async () => {
-        if (!event) return;
-
-        console.log('Event details:', event); // Debug: Check the event data
+        if (!event || !user) return; // Ensure event and user are defined
 
         const stripe = await stripePromise;
         const response = await fetch('http://192.168.0.107:4242/create-checkout-session', {
@@ -85,6 +90,7 @@ const EventDetail: React.FC = () => {
                 price: event.ticketPrice,
                 imageUrl: event.photoURL,
                 type: 'event',
+                userId: user.uid, // Use user ID here
             }),
         });
 
@@ -101,13 +107,9 @@ const EventDetail: React.FC = () => {
         return <div>Loading...</div>;
     }
 
-
     // Formatting start and end times
     const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-
-    const encodedLocation = encodeURIComponent(event.location || '');
-    console.log('Encoded Location URL:', `https://www.google.com/maps/search/?api=1&query=${encodedLocation}`);
 
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center">
@@ -119,8 +121,7 @@ const EventDetail: React.FC = () => {
                 <div className="flex flex-col justify-center">
                     <h1 className="text-5xl font-bold mb-4">{event.eventName}</h1>
                     <p className="text-3xl mb-6">{event.artists.join(', ')}</p>
-                    <p className="text-xl mb-2">{event.club} - {event.location}
-                    </p>
+                    <p className="text-xl mb-2">{event.club} - {event.location}</p>
                     <p className="text-xl mb-2">{startTime} - {endTime}</p>
                     <button 
                         className="bg-black text-white border border-gray-600 text-2xl p-2 mt-6 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"

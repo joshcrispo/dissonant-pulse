@@ -1,9 +1,10 @@
 import React, { useRef, useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import DissonantPulseLogo from '../assets/DP.png';
-import { Bars3Icon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
+import { Bars3Icon, ChevronDownIcon, ChevronUpIcon, LockClosedIcon, TicketIcon, UserIcon } from '@heroicons/react/24/solid';
 import { UserContext } from '../context/UserContext';
 import { auth } from '../firebase';
+import { FaSignOutAlt } from 'react-icons/fa';
 
 
 const Navbar: React.FC = () => {
@@ -101,40 +102,45 @@ const Navbar: React.FC = () => {
                                             </button>
                                             {isAccountMenuOpen && (
                                                 <ul 
-                                                    className={`absolute left-6 top-10 bg-black text-white p-2 
+                                                    className={`absolute left-2 top-8 bg-black text-white p-2
                                                         ${isAccountMenuOpen ? 'dropdown-enter' : 'dropdown-exit'}`}
                                                 >
-                                                    <li>
+                                                    <li className="flex items-center">
                                                         <Link
                                                             to="/profile"
-                                                            className="block px-4 py-2 text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
+                                                            className="block px-4 py-2 text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
                                                         >
+                                                            <UserIcon className="h-5 w-5 mr-2" />
                                                             Profile
                                                         </Link>
                                                     </li>
-                                                    <li>
+                                                    <li className="flex items-center">
                                                         <Link
                                                             to="/tickets"
-                                                            className="block px-4 py-2 text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
+                                                            className="block px-4 py-2 text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
                                                         >
+                                                            <TicketIcon className="h-5 w-5 mr-2" />
                                                             My Tickets
                                                         </Link>
                                                     </li>
                                                     {user?.role === 'admin' && (
-                                                        <li>
+                                                        <li className="flex items-center">
                                                             <Link
+
                                                                 to="/admin"
-                                                                className="block px-4 py-2 text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
+                                                                className="block px-4 py-2 text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
                                                             >
+                                                                <LockClosedIcon className="h-5 w-5 mr-2" />
                                                                 Admin Panel
                                                             </Link>
                                                         </li>
                                                     )}
-                                                    <li>
+                                                    <li className="flex items-center">
                                                         <button
                                                             onClick={handleSignOut}
-                                                            className="block px-4 py-2 text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
+                                                            className="block px-4 py-2 text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 flex items-center"
                                                         >
+                                                            <FaSignOutAlt className="h-5 w-5 mr-2" />
                                                             Sign Out
                                                         </button>
                                                     </li>
@@ -183,31 +189,39 @@ const Navbar: React.FC = () => {
                                     </button>
                                     {isAccountMenuOpen && (
                                         <ul
-                                            className={`absolute bg-black text-white shadow-lg p-4 mt-1 border border-white 
-                                                ${isAccountMenuOpen ? 'dropdown-enter' : 'dropdown-exit'}`}
+                                            className={`absolute bg-black text-white shadow-lg p-4 mt-1 border border-white rounded-lg 
+                                            ${isAccountMenuOpen ? 'dropdown-enter' : 'dropdown-exit'} w-60 right-5 z-50`}
                                         >
-                                            <li className="mb-2">
-                                                <Link to="/profile" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-6 py-2 text-center block">
+                                            <li className="mb-2 flex items-center">
+                                                <Link to="/profile" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-2 py-2 flex items-center w-full">
+                                                    <UserIcon className="h-5 w-5 mr-2" />
                                                     Profile
                                                 </Link>
                                             </li>
-                                            <li className="mb-2">
-                                                <Link to="/tickets" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-6 py-2 text-center block">
-                                                    Tickets
+                                            <li className="mb-2 flex items-center">
+                                                <Link to="/tickets" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-2 py-2 flex items-center w-full">
+                                                    <TicketIcon className="h-5 w-5 mr-2" />
+                                                    My Tickets
                                                 </Link>
                                             </li>
                                             {user?.role === 'admin' && (
-                                                <li className="mb-2">
-                                                    <Link to="/admin" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-6 py-2 text-center block">
-                                                        Admin
-                                                    </Link>
-                                                </li>
+                                                <>
+                                                    <li className="border-t border-gray-600 my-2"></li> 
+                                                    <li className="mb-2 flex items-center">
+                                                        <Link to="/admin" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-2 py-2 flex items-center w-full">
+                                                            <LockClosedIcon className="h-5 w-5 mr-2" />
+                                                            Admin Panel
+                                                        </Link>
+                                                    </li>
+                                                </>
                                             )}
-                                            <li className="mb-2">
+                                            <li className="border-t border-gray-600 my-2"></li> 
+                                            <li className="flex items-center">
                                                 <button
                                                     onClick={handleSignOut}
-                                                    className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-6 py-2 text-center block w-full text-left focus:outline-none"
+                                                    className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-2 py-2 flex items-center w-full focus:outline-none"
                                                 >
+                                                    <FaSignOutAlt className="h-5 w-5 mr-2" /> {/* Replace with the logout icon */}
                                                     Logout
                                                 </button>
                                             </li>

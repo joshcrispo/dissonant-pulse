@@ -5,9 +5,9 @@ import { db } from '../firebase';
 import { slugify } from '../utils';
 import { Helmet } from 'react-helmet';
 import { loadStripe } from '@stripe/stripe-js';
+import { auth } from '../firebase'; // Import your auth instance
 
 const stripePromise = loadStripe('pk_test_51Q5GPFFokBZMd6H1Y5gRZRjgxymtpkidvkXawPrY9nGgibQMEFDM71WTZWyUjqU2Q9dxVsGfalEYI29Ahpg7qnxN006lFJR48h');
-
 
 type ShopItem = {
     id: string;
@@ -20,7 +20,17 @@ type ShopItem = {
 const ShopItemDetail: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const [shopItem, setShopItem] = useState<ShopItem | null>(null);
+    const [user, setUser] = useState<any>(null); // User state
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Get the currently logged in user
+        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+            setUser(currentUser); // Update the user state
+        });
+
+        return () => unsubscribe(); // Cleanup on unmount
+    }, []);
 
     useEffect(() => {
         if (!slug) {
@@ -55,7 +65,7 @@ const ShopItemDetail: React.FC = () => {
     }, [slug, navigate]);
 
     const handleBuyItem = async () => {
-        if (!shopItem) return;
+        if (!shopItem || !user) return; // Ensure shopItem and user are defined
 
         const stripe = await stripePromise;
         const response = await fetch('http://192.168.0.107:4242/create-checkout-session', {
@@ -68,6 +78,7 @@ const ShopItemDetail: React.FC = () => {
                 price: shopItem.price,
                 imageUrl: shopItem.imageUrl,
                 type: 'shop',
+                userId: user.uid, // Pass user ID here
             }),
         });
 

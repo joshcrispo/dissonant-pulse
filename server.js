@@ -11,8 +11,8 @@ app.post('/create-checkout-session', async (req, res) => {
   const { name, price, imageUrl, type } = req.body; 
 
   try {
-    const successUrl = type === 'event' ? `http://192.168.0.107:3000/events/success?itemName=${encodeURIComponent(name)}&itemType=${type}` : `http://192.168.0.107:3000/shop/success?itemName=${encodeURIComponent(name)}&itemType=${type}`;
-    const cancelUrl = type === 'event' ? `http://192.168.0.107:3000/events/cancel?itemName=${encodeURIComponent(name)}&itemType=${type}` : `http://192.168.0.107:3000/shop/cancel?itemName=${encodeURIComponent(name)}&itemType=${type}`;
+    const successUrl = type === 'event' ? `http://localhost:3000/events/success?itemName=${encodeURIComponent(name)}&itemType=${type}` : `http://localhost:3000/shop/success?itemName=${encodeURIComponent(name)}&itemType=${type}`;
+    const cancelUrl = type === 'event' ? `http://localhost:3000/events/cancel?itemName=${encodeURIComponent(name)}&itemType=${type}` : `http://localhost:3000/shop/cancel?itemName=${encodeURIComponent(name)}&itemType=${type}`;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],

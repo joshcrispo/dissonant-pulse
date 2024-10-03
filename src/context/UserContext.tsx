@@ -3,6 +3,14 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
+// Define a Ticket interface to represent ticket data
+export interface Ticket {
+    ticketID: string; // Unique identifier for each ticket
+    createdAt: string; // Date the ticket was created or purchased
+    eventName: string; // Name of the event
+    date: string; // Date of the event (You may want to add this based on your needs)
+}
+
 // Define a User interface that matches your current data structure
 interface User {
     uid: string;
@@ -12,7 +20,7 @@ interface User {
     photoURL: string;
     purchase_tracker: number;
     role: string;
-    tickets: Array<{ eventName: string; date: string }>;
+    tickets: Ticket[]; // Use the Ticket interface here
 }
 
 // Define the UserContext properties
@@ -43,7 +51,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
-                        // Remove 'username' and use other fields
+
+                        // Ensure tickets is correctly typed
+                        const tickets: Ticket[] = (userData.tickets || []).map((ticket: any) => ({
+                            ticketID: ticket.ticketID, // Ensure this matches your Firestore structure
+                            createdAt: ticket.createdAt, // Ensure this matches your Firestore structure
+                            eventName: ticket.eventName, // Ensure this matches your Firestore structure
+                            date: ticket.date, // Include date if needed
+                        }));
+
                         setUser({
                             uid: currentUser.uid,
                             email: currentUser.email || '',
@@ -51,7 +67,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                             photoURL: userData.photoURL || '', // Profile photo URL
                             purchase_tracker: userData.purchase_tracker || 0, // Purchase tracker value
                             role: userData.role || 'user',
-                            tickets: userData.tickets || [], // Array of tickets
+                            tickets, // Assign the processed tickets
                         });
                     }
                 } catch (error) {

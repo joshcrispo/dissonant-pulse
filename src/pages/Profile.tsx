@@ -1,29 +1,79 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { UserContext } from '../context/UserContext'; // Adjust the path as necessary
+import { UserContext } from '../context/UserContext';
 import { FaSignOutAlt, FaCamera } from 'react-icons/fa';
-import { UserIcon, LockClosedIcon } from '@heroicons/react/24/solid'; // Import necessary icons
-import { updateDoc, doc } from 'firebase/firestore';
+import { UserIcon, LockClosedIcon } from '@heroicons/react/24/solid';
+import { updateDoc, doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../firebase';
 
+// Define the Event type
+type Event = {
+    id: string;
+    eventName: string;
+    artists: string[];
+    startDate: Date;
+    endDate: Date;
+    photoURL?: string;
+    location?: string;
+    club?: string;
+};
+
 const Profile: React.FC = () => {
     const navigate = useNavigate();
-    const { user, setUser } = useContext(UserContext); // Access user context
-    const [hover, setHover] = useState(false); // Track hover state for photo container
+    const { user, loading, setUser } = useContext(UserContext);
+    const [hover, setHover] = useState(false);
+    const [eventsData, setEventsData] = useState<{ [key: string]: Event | null }>({});
 
-    // Check if the user is logged in
+    // Check if the user is logged in and loading state
     useEffect(() => {
-        if (!user) {
-            navigate('/login'); // Redirect to login page if no user is logged in
+        if (!loading && !user) {
+            navigate('/login');
         }
-    }, [user, navigate]);
+    }, [user, loading, navigate]);
+
+    // Fetch event data based on tickets when the component mounts
+    // Fetch event data based on tickets when the component mounts
+    // Fetch event data based on tickets when the component mounts
+    useEffect(() => {
+        const fetchEventData = async () => {
+            if (user && user.tickets && user.tickets.length > 0) {
+                const eventsRef = collection(db, 'events');
+                const eventsQuery = query(eventsRef, where('eventName', 'in', user.tickets.map(ticket => ticket.eventName)));
+                
+                const querySnapshot = await getDocs(eventsQuery);
+                const events: Event[] = []; // Use an array instead of an object to store events
+
+                // Iterate over the results to extract event data
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    events.push({
+                        id: doc.id,
+                        eventName: data.eventName,
+                        artists: data.artists,
+                        startDate: (data.startDate as any).toDate(), // Handle Firestore timestamp
+                        endDate: (data.endDate as any).toDate(),
+                        photoURL: data.photoURL,
+                        location: data.location,
+                        club: data.club,
+                    });
+                });
+
+                // Filter for future events and find the closest one
+                const upcomingEvents = events.filter(event => event.startDate > new Date());
+                const closestEvent = upcomingEvents.sort((a, b) => a.startDate.getTime() - b.startDate.getTime())[0]; // Get the closest event
+
+                setEventsData(closestEvent ? { [closestEvent.eventName]: closestEvent } : {}); // Set only the closest event
+            }
+        };
+        fetchEventData();
+    }, [user]);
 
     // Handle sign out
     const handleSignOut = () => {
-        setUser(null); // Reset user context
-        navigate('/login'); // Redirect to login page after logout
+        setUser(null);
+        navigate('/login');
     };
 
     // Handle file change for profile photo
@@ -32,24 +82,21 @@ const Profile: React.FC = () => {
             const file = event.target.files[0];
             const storageRef = ref(storage, `profilePhotos/${user.uid}`);
 
-            // Upload the file to Firebase Storage
             await uploadBytes(storageRef, file);
             const photoURL = await getDownloadURL(storageRef);
 
-            // Update the user's profile photo in Firestore
             const userRef = doc(db, 'users', user.uid);
             await updateDoc(userRef, { photoURL });
 
-            // Update the user context with the new photo URL
             setUser((prevUser) => (prevUser ? { ...prevUser, photoURL } : prevUser));
         }
     };
 
     // Extract user properties
     const { firstName, email, role, photoURL, purchase_tracker, tickets } = user || {};
-    const totalPurchases = purchase_tracker || 0; // Total purchases from user data
-    const rewardThreshold = 5; // Purchases required for a discount
-    const currentRewardLevel = totalPurchases % rewardThreshold; // Current reward progress
+    const totalPurchases = purchase_tracker || 0;
+    const rewardThreshold = 5;
+    const currentRewardLevel = totalPurchases % rewardThreshold;
     const progressBarWidth = `${(currentRewardLevel / rewardThreshold) * 100}%`;
 
     return (
@@ -57,24 +104,21 @@ const Profile: React.FC = () => {
             <Helmet>
                 <title>User Profile</title>
             </Helmet>
-
+    
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-7xl mt-16">
                 {/* User Information Section */}
                 <div className="bg-black p-6 flex flex-col items-center justify-center">
-                    {/* Profile Picture Container */}
                     <div
                         className="relative h-72 w-72 rounded-full mb-4 border-2 border-gray-600 overflow-hidden"
                         onMouseEnter={() => setHover(true)}
                         onMouseLeave={() => setHover(false)}
                     >
-                        {/* Profile Picture */}
                         <img 
                             src={photoURL || 'https://via.placeholder.com/150'}
                             alt="Profile"
                             className="w-full h-full object-cover"
                         />
-
-                        {/* Overlay for Camera Icon on Hover */}
+    
                         {hover && (
                             <div
                                 className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center cursor-pointer"
@@ -83,8 +127,7 @@ const Profile: React.FC = () => {
                                 <FaCamera className="text-white text-5xl" />
                             </div>
                         )}
-
-                        {/* Hidden File Input for Photo Upload */}
+    
                         <input
                             type="file"
                             id="fileInput"
@@ -93,23 +136,37 @@ const Profile: React.FC = () => {
                             onChange={handlePhotoChange}
                         />
                     </div>
-
-                    {/* User Details */}
+    
                     <h2 className="text-2xl font-semibold text-center">{firstName || 'Anonymous'}</h2>
                     <p className="text-lg text-center">Email: {email || 'Not Available'}</p>
                     <p className="text-lg text-center">Role: {role || 'User'}</p>
                 </div>
-
+    
                 {/* My Tickets Section */}
                 <div className="bg-black p-6 flex flex-col">
-                    {/* Upcoming Event Section */}
                     <div className="mb-6">
                         <h2 className="text-3xl font-semibold mb-4">UPCOMING EVENT</h2>
                         {tickets && tickets.length > 0 ? (
-                            <ul className="list-disc pl-5 mb-4 text-lg">
-                                {tickets.map((ticket, index) => (
-                                    <li key={index}>{ticket.eventName} - {ticket.date}</li>
-                                ))}
+                            <ul className="list-disc mb-4 text-lg">
+                                {tickets.map((ticket) => {
+                                    const event = eventsData[ticket.eventName]; // Fetch event data using event name
+                                    return (
+                                        <li key={ticket.ticketID} className="flex mb-4 cursor-pointer" onClick={() => console.log(`Showing tickets for ${ticket.eventName}`)}>
+                                            <div className="flex p-4 w-full items-center hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105">
+                                                {event?.photoURL && (
+                                                    <img src={event.photoURL} alt={ticket.eventName} className="h-24 w-24 object-cover mr-4" />
+                                                )}
+                                                <div className="flex flex-col">
+                                                    <span className="text-lg font-semibold">{ticket.eventName}</span>
+                                                    <span className="text-lg">{event?.club}</span>
+                                                    <span className="text-lg">
+                                                        {event?.startDate?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         ) : (
                             <p className="text-lg mb-4">You have no upcoming tickets.</p>
@@ -121,7 +178,7 @@ const Profile: React.FC = () => {
                             SHOW ALL TICKETS
                         </button>
                     </div>
-
+    
                     {/* Purchase Tracker Section */}
                     <div className="bg-black py-4 mt-1">
                         <h2 className="text-3xl font-semibold mb-2">Reward Tracker</h2>
@@ -142,58 +199,39 @@ const Profile: React.FC = () => {
                         </button>
                     </div>
                 </div>
-
+    
                 {/* Account Settings Section */}
                 <div className="bg-black p-6 flex flex-col h-full">
                     <h2 className="text-3xl font-semibold mb-4">ACCOUNT SETTINGS</h2>
                     
-                    {/* Profile Settings */}
                     <button className="flex items-center hover:text-gray-400 transition duration-300 ease-in-out mb-2">
                         <UserIcon className="h-5 w-5 mr-2" />
                         Update Email
                     </button>
-                    {/* Notification Preferences */}
                     <button className="flex items-center hover:text-gray-400 transition duration-300 ease-in-out mb-2">
                         <UserIcon className="h-5 w-5 mr-2" />
                         Notification Preferences
                     </button>
-
-                    {/* Privacy Settings */}
                     <button className="flex items-center hover:text-gray-400 transition duration-300 ease-in-out mb-2">
                         <LockClosedIcon className="h-5 w-5 mr-2" />
                         Privacy Settings
                     </button>
-
-                    {/* Payment Methods */}
-                    <button className="flex items-center hover:text-gray-400 transition duration-300 ease-in-out mb-2">
+                    <button className="flex hover:text-gray-400 transition duration-300 ease-in-out mb-2">
                         <LockClosedIcon className="h-5 w-5 mr-2" />
                         Manage Payment Methods
                     </button>
-
-                    {/* Existing Options */}
                     <button className="flex items-center hover:text-gray-400 transition duration-300 ease-in-out mb-2">
                         <LockClosedIcon className="h-5 w-5 mr-2" />
                         Change Password
                     </button>
                     <button className="flex items-center hover:text-gray-400 transition duration-300 ease-in-out mb-2">
-                        <LockClosedIcon className="h-5 w-5 mr-2" />
-                        Delete Account
+                        <FaSignOutAlt className="h-5 w-5 mr-2" />
+                        <span onClick={handleSignOut}>Sign Out</span>
                     </button>
-
-                    {/* Logout Button */}
-                    <div className='mt-6'>
-                        <button
-                            onClick={handleSignOut}
-                            className="bg-red-600 text-white border border-gray-600 text-2xl p-2 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 w-full"
-                        >
-                            <FaSignOutAlt className="h-5 w-5 inline-block mr-2" />
-                            Logout
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
-    );
+    );    
 };
 
 export default Profile;

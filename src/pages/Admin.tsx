@@ -349,7 +349,6 @@ const Admin: React.FC = () => {
 
     useEffect(() => {
         fetchShopItems();
-        console.log(shopItems);
     }, [shopItems]);
     
 

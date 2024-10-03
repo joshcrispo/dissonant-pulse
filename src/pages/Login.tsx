@@ -29,16 +29,15 @@ const Login: React.FC = () => {
 
             if (userDoc.exists()) {
                 const userData = userDoc.data();
-                const userRole = userData.role;
-
-                console.log('User role:', userRole);
-                console.log('Login successful');
 
                 setUser({
                     uid: currentUser.uid,
                     email: currentUser.email || '',
-                    username: userData.username || 'Anonymous',
-                    role: userRole,
+                    firstName: userData.firstName || 'Anonymous', 
+                    photoURL: userData.photoURL || '',
+                    purchase_tracker: userData.purchase_tracker || 0, // Set purchase tracker value
+                    role: userData.role || 'user',
+                    tickets: userData.tickets || [], // Array of tickets
                 });
 
                 navigate('/');

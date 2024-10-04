@@ -34,8 +34,6 @@ const Profile: React.FC = () => {
     }, [user, loading, navigate]);
 
     // Fetch event data based on tickets when the component mounts
-    // Fetch event data based on tickets when the component mounts
-    // Fetch event data based on tickets when the component mounts
     useEffect(() => {
         const fetchEventData = async () => {
             if (user && user.tickets && user.tickets.length > 0) {
@@ -43,7 +41,7 @@ const Profile: React.FC = () => {
                 const eventsQuery = query(eventsRef, where('eventName', 'in', user.tickets.map(ticket => ticket.eventName)));
                 
                 const querySnapshot = await getDocs(eventsQuery);
-                const events: Event[] = []; // Use an array instead of an object to store events
+                const events: Event[] = []; // Use an array to store events
 
                 // Iterate over the results to extract event data
                 querySnapshot.forEach((doc) => {
@@ -64,7 +62,12 @@ const Profile: React.FC = () => {
                 const upcomingEvents = events.filter(event => event.startDate > new Date());
                 const closestEvent = upcomingEvents.sort((a, b) => a.startDate.getTime() - b.startDate.getTime())[0]; // Get the closest event
 
-                setEventsData(closestEvent ? { [closestEvent.eventName]: closestEvent } : {}); // Set only the closest event
+                // Set only the closest event
+                if (closestEvent) {
+                    setEventsData({ [closestEvent.eventName]: closestEvent });
+                } else {
+                    setEventsData({}); // Set to an empty object if no upcoming events
+                }        
             }
         };
         fetchEventData();
@@ -75,6 +78,11 @@ const Profile: React.FC = () => {
         setUser(null);
         navigate('/login');
     };
+    
+    const handleShowAllTickets = () => {
+        navigate('/tickets');
+    };
+    
 
     // Handle file change for profile photo
     const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,8 +104,8 @@ const Profile: React.FC = () => {
     const { firstName, email, role, photoURL, purchase_tracker, tickets } = user || {};
     const totalPurchases = purchase_tracker || 0;
     const rewardThreshold = 5;
-    const currentRewardLevel = totalPurchases % rewardThreshold;
-    const progressBarWidth = `${(currentRewardLevel / rewardThreshold) * 100}%`;
+    const hasReward = totalPurchases >= rewardThreshold;
+    const progressBarWidth = hasReward ? '100%' : `${(totalPurchases / rewardThreshold) * 100}%`;
 
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center p-4">
@@ -105,7 +113,7 @@ const Profile: React.FC = () => {
                 <title>User Profile</title>
             </Helmet>
     
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-7xl mt-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-7xl mt-4">
                 {/* User Information Section */}
                 <div className="bg-black p-6 flex flex-col items-center justify-center">
                     <div
@@ -144,28 +152,28 @@ const Profile: React.FC = () => {
     
                 {/* My Tickets Section */}
                 <div className="bg-black p-6 flex flex-col">
-                    <div className="mb-6">
-                        <h2 className="text-3xl font-semibold mb-4">UPCOMING EVENT</h2>
-                        {tickets && tickets.length > 0 ? (
+                    <div className="mb-2">
+                        <h2 className="text-3xl font-bold mb-4">UPCOMING EVENT</h2>
+                        {tickets && tickets.length > 0 && eventsData && Object.keys(eventsData).length > 0 ? (
                             <ul className="list-disc mb-4 text-lg">
                                 {tickets.map((ticket) => {
                                     const event = eventsData[ticket.eventName]; // Fetch event data using event name
-                                    return (
+                                    return event ? (
                                         <li key={ticket.ticketID} className="flex mb-4 cursor-pointer" onClick={() => console.log(`Showing tickets for ${ticket.eventName}`)}>
                                             <div className="flex p-4 w-full items-center hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105">
-                                                {event?.photoURL && (
+                                                {event.photoURL && (
                                                     <img src={event.photoURL} alt={ticket.eventName} className="h-24 w-24 object-cover mr-4" />
                                                 )}
                                                 <div className="flex flex-col">
                                                     <span className="text-lg font-semibold">{ticket.eventName}</span>
-                                                    <span className="text-lg">{event?.club}</span>
+                                                    <span className="text-lg">{event.club}</span>
                                                     <span className="text-lg">
-                                                        {event?.startDate?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        {event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                     </span>
                                                 </div>
                                             </div>
                                         </li>
-                                    );
+                                    ) : null;
                                 })}
                             </ul>
                         ) : (
@@ -173,7 +181,7 @@ const Profile: React.FC = () => {
                         )}
                         <button 
                             className="w-full bg-black text-white border border-gray-600 text-2xl p-2 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
-                            onClick={() => console.log("Show Tickets")}
+                            onClick={handleShowAllTickets}
                         >
                             SHOW ALL TICKETS
                         </button>
@@ -181,19 +189,24 @@ const Profile: React.FC = () => {
     
                     {/* Purchase Tracker Section */}
                     <div className="bg-black py-4 mt-1">
-                        <h2 className="text-3xl font-semibold mb-2">Reward Tracker</h2>
-                        <div className="w-full bg-gray-700 rounded h-4 relative">
+                        <h2 className="text-3xl font-bold mb-4">REWARD TRACKER</h2>
+                        <div className="w-full bg-gray-700 rounded h-8 relative">
                             <div
-                                className="bg-white h-full rounded"
+                                className={`bg-white h-full rounded ${totalPurchases >= rewardThreshold ? 'text-center flex items-center justify-center' : ''}`}
                                 style={{ width: progressBarWidth }}
-                            />
+                            >
+                                {totalPurchases >= rewardThreshold && (
+                                    <span className="text-black font-semibold">YOU HAVE A REWARD</span>
+                                )}
+                            </div>
                         </div>
                         <p className="text-md mt-2">
-                            {currentRewardLevel}/{rewardThreshold} Purchases for next discount!
+                            {totalPurchases < rewardThreshold ? `${totalPurchases}/${rewardThreshold} Purchases for next discount!` : null}
                         </p>
                         <button 
                             className="w-full bg-black text-white border border-gray-600 text-2xl p-2 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 mt-4"
                             onClick={() => console.log("Claim Discount")}
+                            disabled={totalPurchases < rewardThreshold}
                         >
                             CLAIM DISCOUNT
                         </button>
@@ -202,7 +215,7 @@ const Profile: React.FC = () => {
     
                 {/* Account Settings Section */}
                 <div className="bg-black p-6 flex flex-col h-full">
-                    <h2 className="text-3xl font-semibold mb-4">ACCOUNT SETTINGS</h2>
+                    <h2 className="text-3xl font-bold mb-4">ACCOUNT SETTINGS</h2>
                     
                     <button className="flex items-center hover:text-gray-400 transition duration-300 ease-in-out mb-2">
                         <UserIcon className="h-5 w-5 mr-2" />
@@ -225,13 +238,13 @@ const Profile: React.FC = () => {
                         Change Password
                     </button>
                     <button className="flex items-center hover:text-gray-400 transition duration-300 ease-in-out mb-2">
-                        <FaSignOutAlt className="h-5 w-5 mr-2" />
-                        <span onClick={handleSignOut}>Sign Out</span>
+                        <FaSignOutAlt className="h-5 w-5 mr-2 ml-1" onClick={handleSignOut}/>
+                        Sign Out
                     </button>
                 </div>
             </div>
         </div>
-    );    
+    );
 };
 
 export default Profile;

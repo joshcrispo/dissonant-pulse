@@ -13,6 +13,7 @@ import ShopItemDetail from './pages/ShopItemDetail';
 import Success from './pages/Success';
 import Cancel from './pages/Cancel';
 import Profile from './pages/Profile';
+import Tickets from './pages/Tickets';
 
 import Navbar from './components/Navbar';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
@@ -44,6 +45,7 @@ const Main: React.FC = () => {
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/:slug" element={<ShopItemDetail />} />
           <Route path='/profile' element={<Profile />} />
+          <Route path='/tickets' element={<Tickets />} />
 
           <Route path="/shop/success" element={<Success />} />
           <Route path="/shop/cancel" element={<Cancel />} />

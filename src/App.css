@@ -110,3 +110,22 @@
 .dropdown-exit {
   animation: dropdown-exit 0.3s ease forwards;
 }
+
+@keyframes flash {
+  0% {
+      background-color: #1f2937; /* Background color when inactive */
+      transform: scale(1);
+  }
+  50% {
+      background-color: #3b82f6; /* Highlight color */
+      transform: scale(1.05);
+  }
+  100% {
+      background-color: #1f2937; /* Background color when inactive */
+      transform: scale(1);
+  }
+}
+
+.flashing {
+  animation: flash 0.5s infinite;
+}

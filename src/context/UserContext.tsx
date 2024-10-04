@@ -12,7 +12,7 @@ export interface Ticket {
 }
 
 // Define a User interface that matches your current data structure
-interface User {
+export interface User {
     uid: string;
     email: string;
     firstName: string;

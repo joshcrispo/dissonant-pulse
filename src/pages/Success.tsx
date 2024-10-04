@@ -23,6 +23,11 @@ const Success: React.FC = () => {
     const auth = getAuth();
     const db = getFirestore();
 
+    const handleShowAllTickets = () => {
+        navigate('/tickets');
+    };
+
+
     // Extract necessary information from location or search params
     const itemType = location.state?.itemType || searchParams.get('itemType') || 'event';
     const itemName = location.state?.itemName || searchParams.get('itemName') || '';
@@ -128,13 +133,30 @@ const Success: React.FC = () => {
                         {`You have successfully purchased ${quantity} ticket${quantity > 1 ? 's' : ''} for`} <span className="font-bold">{itemName}</span>.
                     </p>
                 )}
-                <div className="flex justify-center">
-                    <button
-                        className="bg-black text-white border border-gray-600 text-xl sm:text-2xl p-2 mt-6 w-full sm:w-auto hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
-                        onClick={handleGoBack}
-                    >
-                        ← Back to {itemType === 'event' ? 'Events' : 'Shop'}
-                    </button>
+                <div className="flex justify-center space-x-4 mt-6">
+                    {itemType === 'event' ? (
+                        <>
+                            <button
+                                className="bg-black text-white border border-gray-600 text-xl sm:text-2xl p-2 w-full sm:w-auto hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
+                                onClick={handleGoBack}
+                            >
+                                ← Back to Events
+                            </button>
+                            <button
+                                className="bg-black text-white border border-gray-600 text-xl sm:text-2xl p-2 w-full sm:w-auto hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
+                                onClick={handleShowAllTickets}
+                            >
+                                Go to My Tickets
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            className="bg-black text-white border border-gray-600 text-xl sm:text-2xl p-2 w-full sm:w-auto hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
+                            onClick={handleGoBack}
+                        >
+                            ← Back to Shop
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

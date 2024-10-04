@@ -208,34 +208,78 @@ const Tickets: React.FC = () => {
                         );
                     })}
 
-
                     {/* QRModal for displaying the QR code */}
-                    <QRModal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
-                        {selectedTickets.length > 0 && (
-                            <div className="flex flex-col items-center">
-                                <h2 className="text-2xl font-bold text-black mb-4">
-                                    Ticket #{currentTicketIndex + 1} - {selectedTickets[currentTicketIndex].eventName}
-                                </h2>
-                                <div className="p-4 bg-white shadow-md">
-                                    <QRCodeSVG value={selectedTickets[currentTicketIndex].ticketID} size={256}/>
-                                </div>
-                                <div className="flex mt-16">
-                                <button
-                                    className="w-32 px-4 py-2 mx-2 border border-gray-600 text-black"
-                                    onClick={prevTicket}
-                                >
-                                    Previous
-                                </button>
-                                <button
-                                    className="w-32 px-4 py-2 mx-2 border border-gray-600 text-black"
-                                    onClick={nextTicket}
-                                >
-                                    Next
-                                </button>
-                                </div>
-                            </div>
-                        )}
-                    </QRModal>
+<QRModal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
+  {selectedTickets.length > 0 && (
+    <div className="flex flex-col lg:flex-row items-start lg:justify-between max-w-4xl max-h-screen overflow-auto">
+      {/* Left Section: Event Details (Visible only for large screens) */}
+      {eventsData.length > 0 && (
+        <div className="hidden lg:block lg:w-full lg:pr-4">
+          {eventsData
+            .filter((event) => event.eventName === selectedTickets[currentTicketIndex].eventName)
+            .map((event) => {
+                const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                return (
+                    <div key={event.id} className="">
+                        <h2 className="text-8xl text-black font-bold mb-2">{event.eventName}</h2>
+                        <p className="text-3xl text-black mb-4">{event.artists.join(', ')}</p>
+
+                        <svg className="my-6 w-full h-8" viewBox="0 0 200 24" preserveAspectRatio="none">
+                            <path
+                                className="wave-path wave1"
+                                d="M0 10 Q 20 0, 40 10 T 80 10 T 120 10 T 160 10 T 200 10"
+                                fill="transparent"
+                                stroke="#000000"  // Change to solid black
+                                strokeWidth="2"
+                            />
+                            <path
+                                className="wave-path wave2"
+                                d="M0 15 Q 20 5, 40 15 T 80 15 T 120 15 T 160 15 T 200 15"
+                                fill="transparent"
+                                stroke="#000000"  // Change to solid black
+                                strokeWidth="2"
+                            />
+                        </svg>
+                        
+                        <p className="text-black font-semibold">{event.club}</p>
+                        <p className="text-black font-semibold">{startTime} - {endTime}</p>
+                        <p className="text-black font-semibold">{event.location}</p>
+                        {/* Add more details as needed */}
+                    </div>
+                );
+            })}
+        </div>
+      )}
+
+      {/* Right Section: Ticket Details and QR Code */}
+      <div className="flex flex-col items-center lg:w-1/2 lg:pl-24">
+        <h2 className="text-2xl font-bold text-black mb-4">
+          Ticket #{currentTicketIndex + 1} - {selectedTickets[currentTicketIndex].eventName}
+        </h2>
+        <div className="p-4 bg-white shadow-md">
+          <QRCodeSVG value={selectedTickets[currentTicketIndex].ticketID} size={256} />
+        </div>
+        {/* Navigation Buttons */}
+        <div className="flex mt-4">
+          <button
+            className="w-32 px-4 py-2 mx-2 border border-gray-600 text-black"
+            onClick={prevTicket}
+          >
+            Previous
+          </button>
+          <button
+            className="w-32 px-4 py-2 mx-2 border border-gray-600 text-black"
+            onClick={nextTicket}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+</QRModal>
+
                 </div>
             </section>
         </div>

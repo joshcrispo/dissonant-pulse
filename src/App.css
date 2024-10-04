@@ -129,3 +129,27 @@
 .flashing {
   animation: flash 0.5s infinite;
 }
+
+.wave-path {
+  stroke-dasharray: 150;  /* Controls the visible portion of the path */
+  stroke-dashoffset: 0;   /* Initial offset */
+  animation: waveLoop 5s linear infinite;  /* Seamless looping animation */
+}
+
+@keyframes waveLoop {
+  0% {
+    stroke-dashoffset: 0;  /* Start position */
+  }
+  100% {
+    stroke-dashoffset: 150;  /* Move the offset to create an endless loop */
+  }
+}
+
+/* Apply different speeds and directions to the paths */
+.wave1 {
+  animation: waveLoop 6s linear infinite;  /* Slower speed */
+}
+
+.wave2 {
+  animation: waveLoop 4s linear infinite reverse;  /* Faster speed, opposite direction */
+}

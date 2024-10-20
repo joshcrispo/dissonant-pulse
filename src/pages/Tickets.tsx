@@ -7,7 +7,6 @@ import { UserContext } from '../context/UserContext';
 import QRModal from '../components/QRModal';
 import { QRCodeSVG } from 'qrcode.react';
 
-// Define the Event type
 type Event = {
     id: string;
     eventName: string;
@@ -19,7 +18,6 @@ type Event = {
     club?: string;
 };
 
-// Define the Ticket type
 type Ticket = {
     createdAt: string;
     date: string;
@@ -27,16 +25,15 @@ type Ticket = {
     ticketID: string;
 };
 
-// Define the UserTicket type
 type UserTicket = {
     eventName: string;
-    tickets: Ticket[]; // An array of Ticket objects
+    tickets: Ticket[];
 };
 
 const Tickets: React.FC = () => {
     const { user } = useContext(UserContext);
     const [eventsData, setEventsData] = useState<Event[]>([]);
-    const [userTicketsData, setUserTicketsData] = useState<UserTicket[]>([]); // State to hold user tickets
+    const [userTicketsData, setUserTicketsData] = useState<UserTicket[]>([]);
     const [selectedTickets, setSelectedTickets] = useState<Ticket[]>([]);
     const [currentTicketIndex, setCurrentTicketIndex] = useState(0);
     const [isModalOpen, setModalOpen] = useState(false);
@@ -49,9 +46,8 @@ const Tickets: React.FC = () => {
                 const userDoc = await getDoc(userRef);
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
-                    const userTickets: UserTicket[] = userData.tickets || []; // Default to an empty array if tickets field is undefined
+                    const userTickets: UserTicket[] = userData.tickets || []; 
                     
-                    // Store fetched user tickets in state
                     setUserTicketsData(userTickets);
                 } else {
                     console.log("No such user document!");
@@ -86,7 +82,7 @@ const Tickets: React.FC = () => {
                 });
             });
 
-            setEventsData(events); // Set the array of events
+            setEventsData(events);
         } else {
             console.log('User is null or has no tickets.');
         }
@@ -100,7 +96,7 @@ const Tickets: React.FC = () => {
     
     useEffect(() => {
         fetchEventData();
-    }, [userTicketsData]); // Fetch event data when user tickets data changes
+    }, [userTicketsData]);
 
     const handleShowTickets = (tickets: Ticket[]) => {
         setSelectedTickets(tickets);
@@ -116,7 +112,6 @@ const Tickets: React.FC = () => {
         setCurrentTicketIndex((prevIndex) => (prevIndex - 1 + selectedTickets.length) % selectedTickets.length);
     };
 
-    // Separate events into upcoming and past
     const now = new Date();
     const upcomingEvents = eventsData.filter(event => event.startDate > now);
     const pastEvents = eventsData.filter(event => event.startDate <= now);
@@ -129,7 +124,6 @@ const Tickets: React.FC = () => {
             <section className="mx-auto text-center md:text-start w-9/12 max-w-9xl">
                 <h1 className="my-12 text-6xl font-bold">MY TICKETS</h1>
                 <div className="w-full">
-                    {/* Upcoming Events */}
                     {upcomingEvents.map(event => {
                         const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
                         const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
@@ -156,7 +150,7 @@ const Tickets: React.FC = () => {
                                         {userTickets.length > 0 && (
                                             <button
                                                 className="bg-black text-white border border-gray-600 text-xl sm:text-2xl p-2 mt-2 w-full sm:w-auto hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
-                                                onClick={() => handleShowTickets(userTickets)} // Show all tickets for this event
+                                                onClick={() => handleShowTickets(userTickets)}
                                             >
                                                 Show Tickets
                                             </button>
@@ -167,10 +161,8 @@ const Tickets: React.FC = () => {
                         );
                     })}
 
-                    {/* Conditional Divider for Past Events */}
                     {pastEvents.length > 0 && <hr className="my-8 border-gray-600" />}
 
-                    {/* Past Events */}
                     {pastEvents.map(event => {
                         const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
                         const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
@@ -197,7 +189,7 @@ const Tickets: React.FC = () => {
                                         {userTickets.length > 0 && (
                                             <button
                                                 className="bg-black text-white border border-gray-600 text-xl sm:text-2xl p-2 mt-2 w-full sm:w-auto hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
-                                                onClick={() => handleShowTickets(userTickets)} // Show all tickets for this event
+                                                onClick={() => handleShowTickets(userTickets)}
                                             >
                                                 Show Tickets
                                             </button>
@@ -209,77 +201,75 @@ const Tickets: React.FC = () => {
                     })}
 
                     {/* QRModal for displaying the QR code */}
-<QRModal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
-  {selectedTickets.length > 0 && (
-    <div className="flex flex-col lg:flex-row items-start lg:justify-between max-w-4xl max-h-screen overflow-auto">
-      {/* Left Section: Event Details (Visible only for large screens) */}
-      {eventsData.length > 0 && (
-        <div className="hidden lg:block lg:w-full lg:pr-4">
-          {eventsData
-            .filter((event) => event.eventName === selectedTickets[currentTicketIndex].eventName)
-            .map((event) => {
-                const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-                const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-                return (
-                    <div key={event.id} className="">
-                        <h2 className="text-8xl text-black font-bold mb-2">{event.eventName}</h2>
-                        <p className="text-3xl text-black mb-4">{event.artists.join(', ')}</p>
+                    <QRModal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
+                    {selectedTickets.length > 0 && (
+                        <div className="flex flex-col lg:flex-row items-start lg:justify-between max-w-4xl max-h-screen overflow-auto">
+                        {/* Left Section: Event Details (Visible only for large screens) */}
+                        {eventsData.length > 0 && (
+                            <div className="hidden lg:block lg:w-full lg:pr-4">
+                            {eventsData
+                                .filter((event) => event.eventName === selectedTickets[currentTicketIndex].eventName)
+                                .map((event) => {
+                                    const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                                    const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                                    return (
+                                        <div key={event.id} className="">
+                                            <h2 className="text-8xl text-black font-bold mb-2">{event.eventName}</h2>
+                                            <p className="text-3xl text-black mb-4">{event.artists.join(', ')}</p>
 
-                        <svg className="my-6 w-full h-8" viewBox="0 0 200 24" preserveAspectRatio="none">
-                            <path
-                                className="wave-path wave1"
-                                d="M0 10 Q 20 0, 40 10 T 80 10 T 120 10 T 160 10 T 200 10"
-                                fill="transparent"
-                                stroke="#000000"  // Change to solid black
-                                strokeWidth="2"
-                            />
-                            <path
-                                className="wave-path wave2"
-                                d="M0 15 Q 20 5, 40 15 T 80 15 T 120 15 T 160 15 T 200 15"
-                                fill="transparent"
-                                stroke="#000000"  // Change to solid black
-                                strokeWidth="2"
-                            />
-                        </svg>
-                        
-                        <p className="text-black font-semibold">{event.club}</p>
-                        <p className="text-black font-semibold">{startTime} - {endTime}</p>
-                        <p className="text-black font-semibold">{event.location}</p>
-                        {/* Add more details as needed */}
-                    </div>
-                );
-            })}
-        </div>
-      )}
+                                            <svg className="my-6 w-full h-8" viewBox="0 0 200 24" preserveAspectRatio="none">
+                                                <path
+                                                    className="wave-path wave1"
+                                                    d="M0 10 Q 20 0, 40 10 T 80 10 T 120 10 T 160 10 T 200 10"
+                                                    fill="transparent"
+                                                    stroke="#000000"
+                                                    strokeWidth="2"
+                                                />
+                                                <path
+                                                    className="wave-path wave2"
+                                                    d="M0 15 Q 20 5, 40 15 T 80 15 T 120 15 T 160 15 T 200 15"
+                                                    fill="transparent"
+                                                    stroke="#000000"
+                                                    strokeWidth="2"
+                                                />
+                                            </svg>
+                                            
+                                            <p className="text-black font-semibold">{event.club}</p>
+                                            <p className="text-black font-semibold">{startTime} - {endTime}</p>
+                                            <p className="text-black font-semibold">{event.location}</p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
 
-      {/* Right Section: Ticket Details and QR Code */}
-      <div className="flex flex-col items-center lg:w-1/2 lg:pl-24">
-        <h2 className="text-2xl font-bold text-black mb-4">
-          Ticket #{currentTicketIndex + 1} - {selectedTickets[currentTicketIndex].eventName}
-        </h2>
-        <div className="p-4 bg-white shadow-md">
-          <QRCodeSVG value={selectedTickets[currentTicketIndex].ticketID} size={256} />
-        </div>
-        {/* Navigation Buttons */}
-        <div className="flex mt-4">
-          <button
-            className="w-32 px-4 py-2 mx-2 border border-gray-600 text-black"
-            onClick={prevTicket}
-          >
-            Previous
-          </button>
-          <button
-            className="w-32 px-4 py-2 mx-2 border border-gray-600 text-black"
-            onClick={nextTicket}
-          >
-            Next
-          </button>
-        </div>
-      </div>
-    </div>
-  )}
-</QRModal>
-
+                        {/* Right Section: Ticket Details and QR Code */}
+                        <div className="flex flex-col items-center lg:w-1/2 lg:pl-24">
+                            <h2 className="text-2xl font-bold text-black mb-4">
+                            Ticket #{currentTicketIndex + 1} - {selectedTickets[currentTicketIndex].eventName}
+                            </h2>
+                            <div className="p-4 bg-white shadow-md">
+                            <QRCodeSVG value={selectedTickets[currentTicketIndex].ticketID} size={256} />
+                            </div>
+                            {/* Navigation Buttons */}
+                            <div className="flex mt-4">
+                            <button
+                                className="w-32 px-4 py-2 mx-2 border border-gray-600 text-black"
+                                onClick={prevTicket}
+                            >
+                                Previous
+                            </button>
+                            <button
+                                className="w-32 px-4 py-2 mx-2 border border-gray-600 text-black"
+                                onClick={nextTicket}
+                            >
+                                Next
+                            </button>
+                            </div>
+                        </div>
+                        </div>
+                    )}
+                    </QRModal>
                 </div>
             </section>
         </div>

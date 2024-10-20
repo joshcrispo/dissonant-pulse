@@ -1,30 +1,28 @@
 import React, { useEffect, useRef, useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Helmet } from 'react-helmet';
-import Model from '../components/Model'; // Import your Model component
+import Model from '../components/Model';
 import { PerspectiveCamera } from '@react-three/drei';
 
 const About: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
-    const [isVisibleValues, setIsVisibleValues] = useState(false); // New state for values section
-    const [isVisibleVision, setIsVisibleVision] = useState(false); // New state for vision section
-    const [isVisibleProjects, setIsVisibleProjects] = useState(false); // New state for projects section
-    const [isVisibleInvolved, setIsVisibleInvolved] = useState(false); // New state for involvement section
+    const [isVisibleValues, setIsVisibleValues] = useState(false);
+    const [isVisibleVision, setIsVisibleVision] = useState(false);
+    const [isVisibleProjects, setIsVisibleProjects] = useState(false);
+    const [isVisibleInvolved, setIsVisibleInvolved] = useState(false);
 
     const aboutRef = useRef<HTMLDivElement | null>(null);
-    const valuesRef = useRef<HTMLDivElement | null>(null); // Ref for values section
-    const visionRef = useRef<HTMLDivElement | null>(null); // Ref for vision section
-    const projectsRef = useRef<HTMLDivElement | null>(null); // Ref for projects section
-    const involvedRef = useRef<HTMLDivElement | null>(null); // Ref for involvement section
+    const valuesRef = useRef<HTMLDivElement | null>(null); 
+    const visionRef = useRef<HTMLDivElement | null>(null);
+    const projectsRef = useRef<HTMLDivElement | null>(null);
+    const involvedRef = useRef<HTMLDivElement | null>(null);
 
-    // Observer for the About section
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
-                    console.log("Element is in view!");
                     setIsVisible(true);
-                    observer.disconnect(); // Stop observing once it's visible
+                    observer.disconnect();
                 }
             },
             { threshold: 0.2 }
@@ -41,12 +39,10 @@ const About: React.FC = () => {
         };
     }, []);
 
-    // Observer for the Values section
     useEffect(() => {
         const valuesObserver = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
-                    console.log("Values section is in view!");
                     setIsVisibleValues(true);
                     valuesObserver.disconnect();
                 }
@@ -65,12 +61,10 @@ const About: React.FC = () => {
         };
     }, []);
 
-    // Observer for the Vision section
     useEffect(() => {
         const visionObserver = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
-                    console.log("Vision section is in view!");
                     setIsVisibleVision(true);
                     visionObserver.disconnect();
                 }
@@ -89,12 +83,10 @@ const About: React.FC = () => {
         };
     }, []);
 
-    // Observer for the Projects section
     useEffect(() => {
         const projectsObserver = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
-                    console.log("Projects section is in view!");
                     setIsVisibleProjects(true);
                     projectsObserver.disconnect();
                 }
@@ -113,12 +105,10 @@ const About: React.FC = () => {
         };
     }, []);
 
-    // Observer for the Get Involved section
     useEffect(() => {
         const involvedObserver = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
-                    console.log("Get Involved section is in view!");
                     setIsVisibleInvolved(true);
                     involvedObserver.disconnect();
                 }

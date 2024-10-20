@@ -1,13 +1,10 @@
-import React, { Suspense, useState } from 'react';
+import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import { setDoc, doc } from 'firebase/firestore';
 import { Helmet } from 'react-helmet';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Canvas } from '@react-three/fiber';
-import Model from '../components/Model';
-import { PerspectiveCamera } from '@react-three/drei';
 
 const Signup: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -59,7 +56,7 @@ const Signup: React.FC = () => {
                 role: 'user',
                 purchase_tracker: 0,
                 tickets: [],
-                photoURL: '', // Initialize photoURL as an empty string
+                photoURL: '',
             });
     
             console.log('Sign-up successful');

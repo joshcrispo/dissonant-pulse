@@ -46,7 +46,6 @@ const Events: React.FC = () => {
             };
         });
     
-        // Separate upcoming and past events
         const now = new Date();
         const upcomingEvents = eventsList.filter(event => event.startDate > now).sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
         const pastEvents = eventsList.filter(event => event.endDate < now).sort((a, b) => b.endDate.getTime() - a.endDate.getTime());
@@ -74,7 +73,6 @@ const Events: React.FC = () => {
                 <h1 className="my-16 text-4xl font-bold">UPCOMING EVENTS</h1>
                 <div className="w-full">
                     {events.upcoming.map(event => {
-                        // Formatting start and end times
                         const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
                         const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     
@@ -109,7 +107,6 @@ const Events: React.FC = () => {
                     })}
                 </div>
     
-                {/* Conditional Divider */}
                 {events.past.length > 0 && (
                     <>
                         <hr className="my-8 border-gray-600" />
@@ -118,7 +115,6 @@ const Events: React.FC = () => {
     
                 <div className="w-full">
                     {visiblePastEvents.map(event => {
-                        // Formatting start and end times
                         const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
                         const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     

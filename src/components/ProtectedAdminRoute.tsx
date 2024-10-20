@@ -17,17 +17,16 @@ const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({ children }) =
         const checkAuth = async () => {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    // Get user role from Firestore
                     const userRef = doc(db, 'users', user.uid);
                     const userDoc = await getDoc(userRef);
 
                     if (userDoc.exists() && userDoc.data().role === 'admin') {
                         setIsAdmin(true);
                     } else {
-                        navigate('/'); // Redirect if not an admin
+                        navigate('/');
                     }
                 } else {
-                    navigate('/login'); // Redirect to login if not authenticated
+                    navigate('/login');
                 }
                 setLoading(false);
             });
@@ -37,7 +36,7 @@ const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({ children }) =
     }, [navigate]);
 
     if (loading) {
-        return <div>Loading...</div>; // Or a loading spinner
+        return <div>Loading...</div>;
     }
 
     return isAdmin ? <>{children}</> : null;

@@ -8,7 +8,6 @@ const Cancel: React.FC = () => {
     const location = useLocation();
     const [searchParams] = useSearchParams();
     
-    // Extract from state or fallback to query params
     const itemType = location.state?.itemType || searchParams.get('itemType') || 'event';
     const itemName = location.state?.itemName || searchParams.get('itemName') || '';
 

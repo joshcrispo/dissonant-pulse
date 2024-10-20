@@ -64,22 +64,19 @@
 }
 
 .about-section {
-  opacity: 0; /* Start hidden */
-  transition: opacity 0.5s ease-in-out; /* Animation for the reveal */
+  opacity: 0; 
+  transition: opacity 0.5s ease-in-out;
 }
 
 .about-section.fade-in-active {
-  opacity: 1; /* Fully visible when in view */
+  opacity: 1;
 }
 
-/* Remove the hidden class */
 .about-section.hidden {
-  /* Instead of display: none, we can set visibility or keep it for alternative usage */
-  visibility: hidden; /* Ensure hidden sections are not visible, but still occupy space */
-  opacity: 0; /* Make sure opacity is set to 0 */
+  visibility: hidden;
+  opacity: 0;
 }
 
-/* Define keyframes for dropdown enter and exit animations */
 @keyframes dropdown-enter {
   from {
       opacity: 0;
@@ -102,7 +99,6 @@
   }
 }
 
-/* Apply the animations to the dropdown */
 .dropdown-enter {
   animation: dropdown-enter 0.3s ease forwards;
 }
@@ -113,15 +109,15 @@
 
 @keyframes flash {
   0% {
-      background-color: #1f2937; /* Background color when inactive */
+      background-color: #1f2937;
       transform: scale(1);
   }
   50% {
-      background-color: #3b82f6; /* Highlight color */
+      background-color: #3b82f6;
       transform: scale(1.05);
   }
   100% {
-      background-color: #1f2937; /* Background color when inactive */
+      background-color: #1f2937;
       transform: scale(1);
   }
 }
@@ -131,25 +127,24 @@
 }
 
 .wave-path {
-  stroke-dasharray: 150;  /* Controls the visible portion of the path */
-  stroke-dashoffset: 0;   /* Initial offset */
-  animation: waveLoop 5s linear infinite;  /* Seamless looping animation */
+  stroke-dasharray: 150;  
+  stroke-dashoffset: 0; 
+  animation: waveLoop 5s linear infinite;
 }
 
 @keyframes waveLoop {
   0% {
-    stroke-dashoffset: 0;  /* Start position */
+    stroke-dashoffset: 0;
   }
   100% {
-    stroke-dashoffset: 150;  /* Move the offset to create an endless loop */
+    stroke-dashoffset: 150; 
   }
 }
 
-/* Apply different speeds and directions to the paths */
 .wave1 {
-  animation: waveLoop 6s linear infinite;  /* Slower speed */
+  animation: waveLoop 6s linear infinite; 
 }
 
 .wave2 {
-  animation: waveLoop 4s linear infinite reverse;  /* Faster speed, opposite direction */
+  animation: waveLoop 4s linear infinite reverse;
 }

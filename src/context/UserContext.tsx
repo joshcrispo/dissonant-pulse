@@ -3,41 +3,37 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
-// Define a Ticket interface to represent ticket data
+
 export interface Ticket {
-    ticketID: string; // Unique identifier for each ticket
-    createdAt: string; // Date the ticket was created or purchased
-    eventName: string; // Name of the event
-    date: string; // Date of the event (You may want to add this based on your needs)
+    ticketID: string;
+    createdAt: string;
+    eventName: string;
+    date: string;
 }
 
-// Define a User interface that matches your current data structure
 export interface User {
     uid: string;
     email: string;
     firstName: string;
-    username?: string; // Optional username property if needed
+    username?: string;
     photoURL: string;
     purchase_tracker: number;
     role: string;
-    tickets: Ticket[]; // Use the Ticket interface here
+    tickets: Ticket[];
 }
 
-// Define the UserContext properties
 interface UserContextProps {
     user: User | null;
     loading: boolean;
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
-// Create a context with initial default values
 export const UserContext = createContext<UserContextProps>({
     user: null,
     loading: true,
-    setUser: () => {}, // Default no-op function
+    setUser: () => {},
 });
 
-// Define the UserProvider component
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
@@ -52,22 +48,21 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
 
-                        // Ensure tickets is correctly typed
                         const tickets: Ticket[] = (userData.tickets || []).map((ticket: any) => ({
-                            ticketID: ticket.ticketID, // Ensure this matches your Firestore structure
-                            createdAt: ticket.createdAt, // Ensure this matches your Firestore structure
-                            eventName: ticket.eventName, // Ensure this matches your Firestore structure
-                            date: ticket.date, // Include date if needed
+                            ticketID: ticket.ticketID,
+                            createdAt: ticket.createdAt,
+                            eventName: ticket.eventName,
+                            date: ticket.date,
                         }));
 
                         setUser({
                             uid: currentUser.uid,
                             email: currentUser.email || '',
-                            firstName: userData.firstName || 'Anonymous', // Use firstName field
-                            photoURL: userData.photoURL || '', // Profile photo URL
-                            purchase_tracker: userData.purchase_tracker || 0, // Purchase tracker value
+                            firstName: userData.firstName || 'Anonymous',
+                            photoURL: userData.photoURL || '',
+                            purchase_tracker: userData.purchase_tracker || 0,
                             role: userData.role || 'user',
-                            tickets, // Assign the processed tickets
+                            tickets,
                         });
                     }
                 } catch (error) {

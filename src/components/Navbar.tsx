@@ -221,7 +221,7 @@ const Navbar: React.FC = () => {
                                                     onClick={handleSignOut}
                                                     className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-2 py-2 flex items-center w-full focus:outline-none"
                                                 >
-                                                    <FaSignOutAlt className="h-5 w-5 mr-2" /> {/* Replace with the logout icon */}
+                                                    <FaSignOutAlt className="h-5 w-5 mr-2" />
                                                     Logout
                                                 </button>
                                             </li>

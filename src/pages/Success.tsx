@@ -6,10 +6,9 @@ import { doc, updateDoc, getFirestore, getDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { Ticket, UserContext } from '../context/UserContext'; // Ensure this path is correct
 
-// Define an interface for Event Tickets
 interface EventTickets {
-    eventName: string;  // The name of the event
-    tickets: Ticket[];   // Array of tickets associated with the event
+    eventName: string; 
+    tickets: Ticket[];
 }
 
 const Success: React.FC = () => {
@@ -18,7 +17,6 @@ const Success: React.FC = () => {
     const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(true);
     
-    // Use UserContext
     const { user } = useContext(UserContext);
     const auth = getAuth();
     const db = getFirestore();
@@ -28,7 +26,6 @@ const Success: React.FC = () => {
     };
 
 
-    // Extract necessary information from location or search params
     const itemType = location.state?.itemType || searchParams.get('itemType') || 'event';
     const itemName = location.state?.itemName || searchParams.get('itemName') || '';
     const quantity = location.state?.quantity || Number(searchParams.get('quantity')) || 1;
@@ -41,7 +38,6 @@ const Success: React.FC = () => {
         }
     };
 
-    // Function to generate unique tickets for each event purchase
     const generateUniqueTickets = (eventName: string, quantity: number): Ticket[] => {
         const tickets: Ticket[] = [];
         for (let i = 0; i < quantity; i++) {
@@ -50,15 +46,14 @@ const Success: React.FC = () => {
                 ticketID: ticketID,
                 createdAt: new Date().toISOString(),
                 eventName: eventName,
-                date: new Date().toISOString(), // Adjust this if needed
+                date: new Date().toISOString(),
             });
         }
         return tickets;
     };
 
-    // Store the generated tickets in the user's profile in Firestore
     useEffect(() => {
-        const userUid = user?.uid; // Safely get the user UID
+        const userUid = user?.uid;
         if (userUid && itemType === 'event') {
             const userDocRef = doc(db, 'users', userUid);
 
@@ -69,10 +64,8 @@ const Success: React.FC = () => {
                         const currentTickets: EventTickets[] = currentData?.tickets || [];
                         const currentPurchaseTracker = currentData?.purchase_tracker || 0;
 
-                        // Generate unique tickets for this event
                         const newTickets = generateUniqueTickets(itemName, quantity);
 
-                        // Check if the event already exists in the user's tickets
                         const eventIndex = currentTickets.findIndex(event => event.eventName === itemName);
                         let updatedTickets: EventTickets[];
 
@@ -81,17 +74,16 @@ const Success: React.FC = () => {
                             updatedTickets = [...currentTickets];
                             updatedTickets[eventIndex] = {
                                 ...existingEvent,
-                                tickets: [...existingEvent.tickets, ...newTickets],  // Append new tickets
+                                tickets: [...existingEvent.tickets, ...newTickets],
                             };
                         } else {
                             const newEvent: EventTickets = {
                                 eventName: itemName,
-                                tickets: newTickets,  // Add new tickets under the new event
+                                tickets: newTickets,
                             };
                             updatedTickets = [...currentTickets, newEvent];
                         }
 
-                        // Update the Firestore document
                         updateDoc(userDocRef, {
                             tickets: updatedTickets,
                             purchase_tracker: currentPurchaseTracker + quantity,

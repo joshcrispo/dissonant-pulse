@@ -151,7 +151,7 @@ const Home: React.FC = () => {
                                 </Link>
 
                             </div>
-                            {/* Right side: Event photo */}
+                            {/* Right side: Gallery */}
                             <div className="col-span-2 flex flex-col justify-center items-center my-6 text-center border border-white transition duration-300 ease-in-out transform hover:scale-105">
                                 <Link
                                     to="/gallery"

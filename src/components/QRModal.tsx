@@ -16,7 +16,7 @@ const QRModal: React.FC<QRModalProps> = ({ isOpen, onClose, children }) => {
                     className="absolute top-2 right-4 text-gray-700 hover:text-black text-2xl"
                     onClick={onClose}
                 >
-                    &#x2715; {/* Unicode for 'X' symbol */}
+                    &#x2715; {/* 'X' symbol */}
                 </button>
                 {children}
             </div>

@@ -35,9 +35,9 @@ const Login: React.FC = () => {
                     email: currentUser.email || '',
                     firstName: userData.firstName || 'Anonymous', 
                     photoURL: userData.photoURL || '',
-                    purchase_tracker: userData.purchase_tracker || 0, // Set purchase tracker value
+                    purchase_tracker: userData.purchase_tracker || 0,
                     role: userData.role || 'user',
-                    tickets: userData.tickets || [], // Array of tickets
+                    tickets: userData.tickets || [],
                 });
 
                 navigate('/');
@@ -62,13 +62,11 @@ const Login: React.FC = () => {
             </Helmet>
 
             <div className="flex flex-col md:flex-row justify-between items-center p-4 w-9/12 mx-auto max-w-9xl">
-                {/* Dissonant Pulse Section */}
                 <div className="hidden lg:flex flex-col justify-between w-full md:w-1/2 h-[180px] px-10">
                     <h1 className="text-white text-6xl font-bold pulse-animation">Dissonant</h1>
                     <h1 className="text-white text-8xl font-bold pulse-animation self-end">PULSE</h1>
                 </div>
 
-                {/* Login Form Section */}
                 <div className="bg-black p-6 border-2 border-white w-full md:w-1/2 max-w-md mx-4">
                     <h1 className="text-3xl font-bold text-white mb-4 text-center">Log In</h1>
 

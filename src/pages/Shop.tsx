@@ -26,7 +26,7 @@ const Shop: React.FC = () => {
                 return {
                     id: doc.id,
                     name: data.shopItemName || 'No Name',
-                    price: data.shopItemPrice ? parseFloat(data.shopItemPrice) : null, // Convert price to number
+                    price: data.shopItemPrice ? parseFloat(data.shopItemPrice) : null,
                     imageUrl: data.shopItemImageUrl,
                 };
             }) as ShopItem[];

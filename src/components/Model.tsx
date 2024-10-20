@@ -4,7 +4,7 @@ import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
 const Model = () => {
-    const { scene } = useGLTF('/dp_3d.glb'); // Load your model
+    const { scene } = useGLTF('/dp_3d.glb'); 
     const groupRef = useRef<THREE.Group>(null);
     const pivotRef = useRef<THREE.Group>(null);
 
@@ -12,9 +12,8 @@ const Model = () => {
         if (groupRef.current) {
             const box = new THREE.Box3().setFromObject(groupRef.current);
             const center = box.getCenter(new THREE.Vector3());
-            groupRef.current.position.sub(center); // Center the model
+            groupRef.current.position.sub(center);
 
-            // Adjust the pivot point
             groupRef.current.position.x += 1;
             groupRef.current.position.y -= 0.5;
             groupRef.current.position.z += 0.2;
@@ -29,7 +28,7 @@ const Model = () => {
 
     useFrame(() => {
         if (pivotRef.current) {
-            pivotRef.current.rotation.y += 0.05; // Adjust rotation speed
+            pivotRef.current.rotation.y += 0.05;
         }
     });
 

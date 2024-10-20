@@ -26,14 +26,12 @@ const Profile: React.FC = () => {
     const [hover, setHover] = useState(false);
     const [eventsData, setEventsData] = useState<{ [key: string]: Event | null }>({});
 
-    // Check if the user is logged in and loading state
     useEffect(() => {
         if (!loading && !user) {
             navigate('/login');
         }
     }, [user, loading, navigate]);
 
-    // Fetch event data based on tickets when the component mounts
     useEffect(() => {
         const fetchEventData = async () => {
             if (user && user.tickets && user.tickets.length > 0) {
@@ -41,16 +39,15 @@ const Profile: React.FC = () => {
                 const eventsQuery = query(eventsRef, where('eventName', 'in', user.tickets.map(ticket => ticket.eventName)));
                 
                 const querySnapshot = await getDocs(eventsQuery);
-                const events: Event[] = []; // Use an array to store events
+                const events: Event[] = []; 
 
-                // Iterate over the results to extract event data
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     events.push({
                         id: doc.id,
                         eventName: data.eventName,
                         artists: data.artists,
-                        startDate: (data.startDate as any).toDate(), // Handle Firestore timestamp
+                        startDate: (data.startDate as any).toDate(), 
                         endDate: (data.endDate as any).toDate(),
                         photoURL: data.photoURL,
                         location: data.location,
@@ -58,22 +55,19 @@ const Profile: React.FC = () => {
                     });
                 });
 
-                // Filter for future events and find the closest one
                 const upcomingEvents = events.filter(event => event.startDate > new Date());
-                const closestEvent = upcomingEvents.sort((a, b) => a.startDate.getTime() - b.startDate.getTime())[0]; // Get the closest event
+                const closestEvent = upcomingEvents.sort((a, b) => a.startDate.getTime() - b.startDate.getTime())[0];
 
-                // Set only the closest event
                 if (closestEvent) {
                     setEventsData({ [closestEvent.eventName]: closestEvent });
                 } else {
-                    setEventsData({}); // Set to an empty object if no upcoming events
+                    setEventsData({});
                 }        
             }
         };
         fetchEventData();
     }, [user]);
 
-    // Handle sign out
     const handleSignOut = () => {
         setUser(null);
         navigate('/login');
@@ -83,8 +77,6 @@ const Profile: React.FC = () => {
         navigate('/tickets');
     };
     
-
-    // Handle file change for profile photo
     const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0] && user) {
             const file = event.target.files[0];
@@ -100,7 +92,6 @@ const Profile: React.FC = () => {
         }
     };
 
-    // Extract user properties
     const { firstName, email, role, photoURL, purchase_tracker, tickets } = user || {};
     const totalPurchases = purchase_tracker || 0;
     const rewardThreshold = 5;
@@ -157,7 +148,7 @@ const Profile: React.FC = () => {
                         {tickets && tickets.length > 0 && eventsData && Object.keys(eventsData).length > 0 ? (
                             <ul className="list-disc mb-4 text-lg">
                                 {tickets.map((ticket) => {
-                                    const event = eventsData[ticket.eventName]; // Fetch event data using event name
+                                    const event = eventsData[ticket.eventName];
                                     return event ? (
                                         <li key={ticket.ticketID} className="flex mb-4 cursor-pointer" onClick={() => console.log(`Showing tickets for ${ticket.eventName}`)}>
                                             <div className="flex p-4 w-full items-center hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105">

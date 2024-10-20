@@ -5,7 +5,7 @@ import { db } from '../firebase';
 import { slugify } from '../utils';
 import { Helmet } from 'react-helmet';
 import { loadStripe } from '@stripe/stripe-js';
-import { auth } from '../firebase'; // Make sure to import auth from your firebase configuration
+import { auth } from '../firebase'; 
 
 const stripePromise = loadStripe('pk_test_51Q5GPFFokBZMd6H1Y5gRZRjgxymtpkidvkXawPrY9nGgibQMEFDM71WTZWyUjqU2Q9dxVsGfalEYI29Ahpg7qnxN006lFJR48h');
 
@@ -35,12 +35,12 @@ const EventDetail: React.FC = () => {
             setUser(currentUser); // Update the user state
         });
 
-        return () => unsubscribe(); // Cleanup on unmount
+        return () => unsubscribe();
     }, []);
 
     useEffect(() => {
         if (!title) {
-            navigate('/events'); // Redirect if title is undefined
+            navigate('/events');
             return;
         }
 
@@ -69,7 +69,7 @@ const EventDetail: React.FC = () => {
                 setEvent(matchedEvent);
             } else {
                 console.error('Event not found');
-                navigate('/events'); // Redirect if event not found
+                navigate('/events');
             }
         };
 
@@ -77,7 +77,7 @@ const EventDetail: React.FC = () => {
     }, [title, navigate]);
 
     const handleBuyItem = async () => {
-        if (!event || !user) return; // Ensure event and user are defined
+        if (!event || !user) return; 
 
         const stripe = await stripePromise;
         const response = await fetch('http://localhost:4242/create-checkout-session', {
@@ -90,13 +90,12 @@ const EventDetail: React.FC = () => {
                 price: event.ticketPrice,
                 imageUrl: event.photoURL,
                 type: 'event',
-                userId: user.uid, // Use user ID here
+                userId: user.uid,
             }),
         });
 
         const session = await response.json();
 
-        // Redirect to Stripe Checkout
         const { error } = await stripe!.redirectToCheckout({ sessionId: session.id });
         if (error) {
             console.error('Stripe checkout error:', error.message);
@@ -107,7 +106,6 @@ const EventDetail: React.FC = () => {
         return <div>Loading...</div>;
     }
 
-    // Formatting start and end times
     const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     const endTime = `${event.endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { addDoc, collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db, storage } from '../firebase';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import { v4 as uuid } from 'uuid';  // For unique image filenames
+import { v4 as uuid } from 'uuid';
 import {
     getDownloadURL,
     ref as storageRef,
@@ -57,7 +57,7 @@ const Admin: React.FC = () => {
     const [shopItemPrice, setShopItemPrice] = useState('');
     const [shopItemImage, setShopItemImage] = useState<File | null>(null);
     const [shopItemImagePreview, setShopItemImagePreview] = useState<string | null>(null);
-    const [editingShopItem, setEditingShopItem] = useState<any>(null);  // Replace `any` with the correct type for shop items.
+    const [editingShopItem, setEditingShopItem] = useState<any>(null); 
 
 
 
@@ -81,7 +81,6 @@ const Admin: React.FC = () => {
             };
         });
     
-        // Filter out past events
         const currentDate = new Date();
         const futureEvents = eventsList.filter(event => event.startDate > currentDate);
     
@@ -104,7 +103,6 @@ const Admin: React.FC = () => {
         setArtists(newArtists);
     };
 
-    // Upload file and get URL
     const uploadFile = async () => {
         if (imageUpload === null) {
             throw new Error("Please select an image");
@@ -143,11 +141,10 @@ const Admin: React.FC = () => {
         setClub(event.club || '');
         setBio(event.bio || '');
         setTicketPrice(event.ticketPrice !== undefined ? event.ticketPrice : ""); 
-        setImagePreview(event.photoURL || null); // Show existing image if available
+        setImagePreview(event.photoURL || null);
     
-        // Handle artist images: If any image is null, replace with empty string for the preview
         const previews = event.artistImages?.map(img => img || '') || [];
-        setArtistImagePreviews(previews);  // This must be an array of strings
+        setArtistImagePreviews(previews);
     
         setShowModal(true);
     };
@@ -188,11 +185,10 @@ const Admin: React.FC = () => {
             
             newArtistImages[index] = file;
             
-            // Always ensure the preview is a string, no null values
             newArtistImagePreviews[index] = URL.createObjectURL(file);
             
             setArtistImages(newArtistImages);
-            setArtistImagePreviews(newArtistImagePreviews);  // This must always be string[]
+            setArtistImagePreviews(newArtistImagePreviews); 
         }
     };
      
@@ -244,7 +240,6 @@ const Admin: React.FC = () => {
         try {
             const eventRef = doc(db, 'events', editingEvent!.id);
     
-            // Handle event image
             let photoURL = editingEvent!.photoURL;
             if (imageUpload) {
                 const imageRef = storageRef(storage, `events/${editingEvent!.id}`);
@@ -252,7 +247,6 @@ const Admin: React.FC = () => {
                 photoURL = await getDownloadURL(imageRef);
             }
     
-            // Handle artist images
             const artistImageUrls: (string | null)[] = [];
             for (let i = 0; i < artistImages.length; i++) {
                 if (artistImages[i]) {
@@ -267,7 +261,6 @@ const Admin: React.FC = () => {
                 }
             }
     
-            // Update the event in Firestore
             await updateDoc(eventRef, {
                 eventName,
                 artists,
@@ -281,7 +274,6 @@ const Admin: React.FC = () => {
                 ticketPrice: Number(ticketPrice),
             });
     
-            // Update the local state
             setEvents(events.map(event =>
                 event.id === editingEvent!.id
                     ? {
@@ -300,7 +292,6 @@ const Admin: React.FC = () => {
                     : event
             ));
     
-            // Clear the form and close the modal
             clearForm();
         } catch (error) {
             console.error('Error updating event:', error);
@@ -331,7 +322,6 @@ const Admin: React.FC = () => {
     };
 
     // Shop
-
     const fetchShopItems = async () => {
         try {
             const shopItemsCollection = collection(db, 'shop_items');
@@ -541,7 +531,6 @@ const Admin: React.FC = () => {
                 </div>
             )}
     
-            {/* Display Events */}
             <div className="flex w-full max-w-7xl mx-auto space-x-4">
                 {/* Left Column: Events */}
                 <div className="flex-1">
@@ -581,21 +570,18 @@ const Admin: React.FC = () => {
                     <div className="space-y-4 w-full max-w-4xl mb-4">
                         {shopItems.map(item => (
                             <div key={item.id} className="flex items-center bg-black text-white p-4 border border-gray-600 shadow-lg">
-                                {/* Image */}
-                                {item.shopItemImageUrl && (  // Use shopItemImageUrl (lowercase 'u')
+                                {item.shopItemImageUrl && (
                                     <img 
-                                        src={item.shopItemImageUrl}  // Use shopItemImageUrl (lowercase 'u')
+                                        src={item.shopItemImageUrl} 
                                         alt={`${item.shopItemName} cover`} 
                                         className="w-32 h-32 object-cover mr-4" 
                                     />
                                 )}
                                 
-                                {/* Content */}
                                 <div className="flex-1">
                                     <h2 className="text-2xl font-bold mb-2">{item.shopItemName}</h2>
                                     <p className="mb-1">${item.shopItemPrice}</p>
                                     
-                                    {/* Edit/Delete buttons */}
                                     <div className="flex space-x-2 mt-2">
                                         <button className="bg-black text-white p-2" onClick={() => handleEditShopItem(item)}><FaEdit /></button>
                                         <button className="bg-black text-white p-2" onClick={() => handleDeleteShopItem(item.id)}><FaTrash /></button>

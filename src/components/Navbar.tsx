@@ -70,8 +70,8 @@ const Navbar: React.FC = () => {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/gallery" className="block px-4 py-2 text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105">
-                                        GALLERY
+                                    <Link to="/podcast" className="block px-4 py-2 text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105">
+                                        PODCAST
                                     </Link>
                                 </li>
                                 <li>
@@ -165,8 +165,8 @@ const Navbar: React.FC = () => {
                         <Link to="/shop" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-6 py-2 text-center block">
                             SHOP
                         </Link>
-                        <Link to="/gallery" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-6 py-2 text-center block">
-                            GALLERY
+                        <Link to="/podcast" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-6 py-2 text-center block">
+                            PODCAST
                         </Link>
                         <Link to="/about" className="text-white hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 px-6 py-2 text-center block">
                             ABOUT

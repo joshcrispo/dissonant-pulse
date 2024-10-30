@@ -19,14 +19,7 @@ import { fetchEvents } from "../utils/FetchEvents";
 import { deleteEvent } from "../utils/DeleteEvent";
 import { uploadFile } from "../utils/UploadFile";
 import { uploadArtistImages } from "../utils/UploadArtistImage";
-
-type ShopItem = {
-  id: string;
-  shopItemName: string;
-  shopItemDescription: string;
-  shopItemPrice: number;
-  shopItemImageUrl: string;
-};
+import AdminShop from "../components/AdminShop";
 
 const Admin: React.FC = () => {
   // Event states
@@ -51,16 +44,7 @@ const Admin: React.FC = () => {
   const [displayEventModal, setDisplayEventModal] = useState(false);
 
   // Shop states
-  const [shopItems, setShopItems] = useState<ShopItem[]>([]);
   const [showShopModal, setShowShopModal] = useState(false);
-  const [shopItemName, setShopItemName] = useState("");
-  const [shopItemDescription, setShopItemDescription] = useState("");
-  const [shopItemPrice, setShopItemPrice] = useState<number | null>(null);
-  const [shopItemImage, setShopItemImage] = useState<File | null>(null);
-  const [shopItemImagePreview, setShopItemImagePreview] = useState<
-    string | null
-  >(null);
-  const [editingShopItem, setEditingShopItem] = useState<ShopItem | null>(null);
 
   // Handler for showing the event modal
   const handleShowEvents = async () => {
@@ -71,6 +55,14 @@ const Admin: React.FC = () => {
 
   const handleDisplayCloseModal = () => {
     setDisplayEventModal(false); // Hide modal
+  };
+
+  const handleShopOpenModal = () => {
+    setShowShopModal(true);
+  };
+
+  const handleShopCloseModal = () => {
+    setShowShopModal(false);
   };
 
   const handleAddEvent = async () => {
@@ -263,6 +255,7 @@ const Admin: React.FC = () => {
     const previews = event.artistImages?.map((img) => img || "") || [];
     setArtistImagePreviews(previews);
 
+    setDisplayEventModal(false);
     setShowModal(true);
   };
 
@@ -327,7 +320,7 @@ const Admin: React.FC = () => {
           <div className="flex flex-col space-y-2 items-center">
             <button
               className="bg-black text-white border border-gray-600 text-2xl p-2 mt-6 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 w-full"
-              onClick={() => setShowModal(true)}
+              onClick={handleShopOpenModal}
             >
               + Add Shop Item
             </button>
@@ -361,7 +354,9 @@ const Admin: React.FC = () => {
             >
               ×
             </span>
-            <h2 className="text-5xl font-bold mb-4 text-center">ADD EVENT</h2>
+            <h2 className="text-5xl font-bold mb-4 text-center">
+              {editingEvent ? "EDIT EVENT" : "ADD EVENT"}
+            </h2>
             <input
               className="bg-neutral-900 rounded-lg border border-white p-2 mb-2 w-full text-white"
               type="text"
@@ -522,23 +517,7 @@ const Admin: React.FC = () => {
       )}
 
       {/* Shop Modal */}
-      {showShopModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-black text-white p-6 border border-gray-600 shadow-lg relative w-full max-w-lg max-h-[80vh] overflow-y-auto">
-            <span className="absolute top-2 right-2 text-xl cursor-pointer">
-              ×
-            </span>
-            <input
-              className="bg-neutral-900 rounded-lg border border-white p-2 mb-2 w-full text-white"
-              type="text"
-              value={shopItemName}
-              onChange={(e) => setShopItemName(e.target.value)}
-              placeholder="Item Name"
-            />
-            {/* Additional input fields remain unchanged */}
-          </div>
-        </div>
-      )}
+      <AdminShop showShopModal={showShopModal} onClose={handleShopCloseModal} />
     </div>
   );
 };

@@ -42,6 +42,7 @@ const Admin: React.FC = () => {
 
   // Display states
   const [displayEventModal, setDisplayEventModal] = useState(false);
+  const [showItems, setShowItems] = useState(false);
 
   // Shop states
   const [showShopModal, setShowShopModal] = useState(false);
@@ -60,9 +61,16 @@ const Admin: React.FC = () => {
   const handleShopOpenModal = () => {
     setShowShopModal(true);
   };
-
   const handleShopCloseModal = () => {
     setShowShopModal(false);
+  };
+
+  const handleShowItems = () => {
+    setShowItems(!showItems);
+  };
+
+  const handleShowItemsClose = () => {
+    setShowItems(false);
   };
 
   const handleAddEvent = async () => {
@@ -324,7 +332,10 @@ const Admin: React.FC = () => {
             >
               + Add Shop Item
             </button>
-            <button className="bg-black text-white border border-gray-600 text-2xl p-2 mt-6 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 w-full">
+            <button
+              className="bg-black text-white border border-gray-600 text-2xl p-2 mt-6 hover:text-gray-400 transition duration-300 ease-in-out transform hover:scale-105 w-full"
+              onClick={handleShowItems}
+            >
               Show Items
             </button>
           </div>
@@ -520,7 +531,12 @@ const Admin: React.FC = () => {
       )}
 
       {/* Shop Modal */}
-      <AdminShop showShopModal={showShopModal} onClose={handleShopCloseModal} />
+      <AdminShop
+        showShopModal={showShopModal}
+        showItems={showItems}
+        onClose={handleShopCloseModal}
+        onCloseItems={handleShowItemsClose}
+      />
     </div>
   );
 };

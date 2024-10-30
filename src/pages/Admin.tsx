@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   addDoc,
   collection,
-  getDocs,
   deleteDoc,
   doc,
   updateDoc,
 } from "firebase/firestore";
 import { db, storage } from "../firebase";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { v4 as uuid } from "uuid";
 import {
   getDownloadURL,
@@ -16,6 +14,11 @@ import {
   uploadBytes,
 } from "firebase/storage";
 import { Event } from "../types/Events";
+import DisplayEventModal from "../components/DisplayEventModal";
+import { fetchEvents } from "../utils/FetchEvents";
+import { deleteEvent } from "../utils/DeleteEvent";
+import { uploadFile } from "../utils/UploadFile";
+import { uploadArtistImages } from "../utils/UploadArtistImage";
 
 type ShopItem = {
   id: string;
@@ -35,7 +38,7 @@ const Admin: React.FC = () => {
   const [location, setLocation] = useState("");
   const [club, setClub] = useState("");
   const [bio, setBio] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [imageUpload, setImageUpload] = useState<File | null>(null);
@@ -59,37 +62,11 @@ const Admin: React.FC = () => {
   >(null);
   const [editingShopItem, setEditingShopItem] = useState<ShopItem | null>(null);
 
-  const fetchEvents = async () => {
-    const eventsCollection = collection(db, "events");
-    const eventsSnapshot = await getDocs(eventsCollection);
-    const eventsList = eventsSnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        eventName: data.eventName,
-        artists: data.artists,
-        startDate: (data.startDate as any).toDate(),
-        endDate: (data.endDate as any).toDate(),
-        photoURL: data.photoURL,
-        location: data.location,
-        club: data.club,
-        bio: data.bio,
-        artistImages: data.artistImages || [],
-        ticketPrice: data.ticketPrice || 0,
-      };
-    });
-    const currentDate = new Date();
-    const futureEvents = eventsList.filter(
-      (event) => event.startDate > currentDate
-    );
-
-    setEvents(futureEvents);
-  };
-
   // Handler for showing the event modal
   const handleShowEvents = async () => {
-    await fetchEvents(); // Fetch events when button is pressed
-    setDisplayEventModal(true); // Show the modal
+    const fetchedEvents = await fetchEvents();
+    setEvents(fetchedEvents);
+    setDisplayEventModal(true);
   };
 
   const handleDisplayCloseModal = () => {
@@ -114,10 +91,10 @@ const Admin: React.FC = () => {
     try {
       let photoURL = "";
       if (imageUpload) {
-        photoURL = await uploadFile();
+        photoURL = await uploadFile(imageUpload, `events/${uuid()}`);
       }
 
-      const artistImageUrls = await uploadArtistImages();
+      const artistImageUrls = await uploadArtistImages(artistImages);
 
       const eventsCollection = collection(db, "events");
       await addDoc(eventsCollection, {
@@ -252,16 +229,6 @@ const Admin: React.FC = () => {
     }
   };
 
-  const uploadFile = async () => {
-    if (imageUpload === null) {
-      throw new Error("Please select an image");
-    }
-
-    const imageRef = storageRef(storage, `events/${uuid()}`);
-    await uploadBytes(imageRef, imageUpload);
-    return await getDownloadURL(imageRef);
-  };
-
   const handleArtistImageChange = (
     index: number,
     e: React.ChangeEvent<HTMLInputElement>
@@ -278,23 +245,6 @@ const Admin: React.FC = () => {
       setArtistImages(newArtistImages);
       setArtistImagePreviews(newArtistImagePreviews);
     }
-  };
-
-  const uploadArtistImages = async () => {
-    const urls: (string | null)[] = [];
-    for (let i = 0; i < artistImages.length; i++) {
-      if (artistImages[i]) {
-        const imageRef = storageRef(storage, `artists/${uuid()}`);
-        await uploadBytes(imageRef, artistImages[i]!);
-        const url = await getDownloadURL(imageRef);
-        urls.push(url);
-      } else if (editingEvent?.artistImages && editingEvent.artistImages[i]) {
-        urls.push(editingEvent.artistImages[i]);
-      } else {
-        urls.push(null);
-      }
-    }
-    return urls;
   };
 
   //Editing
@@ -316,15 +266,9 @@ const Admin: React.FC = () => {
     setShowModal(true);
   };
 
-  //Delete
+  // Deleting
   const handleDeleteEvent = async (id: string) => {
-    try {
-      await deleteDoc(doc(db, "events", id));
-      setEvents(events.filter((event) => event.id !== id));
-    } catch (error) {
-      console.error("Error deleting event:", error);
-      setError("Failed to delete event.");
-    }
+    await deleteEvent(id, setEvents, setError);
   };
 
   const clearForm = () => {
@@ -569,71 +513,12 @@ const Admin: React.FC = () => {
 
       {/* Events list */}
       {displayEventModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-neutral-900 text-white p-8 rounded-lg shadow-lg relative w-3/5 max-h-[80vh] overflow-y-auto">
-            <span
-              className="absolute top-1 right-3 text-5xl cursor-pointer"
-              onClick={handleDisplayCloseModal}
-            >
-              ×
-            </span>
-            <h2 className="text-5xl font-bold mb-4 pl-4">EVENTS</h2>
-            <div className="space-y-4 w-full max-w-4xl mb-4">
-              {events.map((event) => {
-                const startTime = `${event.startDate.toLocaleDateString()} ${event.startDate.toLocaleTimeString(
-                  [],
-                  { hour: "2-digit", minute: "2-digit" }
-                )}`;
-                const endTime = `${event.endDate.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}`;
-
-                return (
-                  <div
-                    key={event.id}
-                    className="flex items-center bg-neutral-900 rounded-lg text-white p-4 "
-                  >
-                    {event.photoURL && (
-                      <img
-                        src={event.photoURL}
-                        alt={`${event.eventName} cover`}
-                        className="w-64 h-48 object-cover mr-4"
-                      />
-                    )}
-                    <div className="flex-1">
-                      <h2 className="text-2xl font-bold mb-2">
-                        {event.eventName}
-                      </h2>
-                      <p className="font-bold mb-1">
-                        {event.artists.join(", ")}
-                      </p>
-                      <p className="font-bold mb-1">{event.club}</p>
-                      <p className="mb-1">
-                        {startTime} - {endTime}
-                      </p>
-                      <p className="mb-1">Ticket Price: €{event.ticketPrice}</p>
-                      <div className="flex space-x-2 mt-2">
-                        <button
-                          className="bg-orange-600 w-full rounded-lg border border-white text-white p-2 mb-2"
-                          onClick={() => handleEditEvent(event)}
-                        >
-                          EDIT
-                        </button>
-                        <button
-                          className="bg-red-900 w-full font-bold rounded-lg border border-white text-white p-2 mb-2"
-                          onClick={() => handleDeleteEvent(event.id)}
-                        >
-                          DELETE
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        <DisplayEventModal
+          events={events}
+          onClose={handleDisplayCloseModal}
+          onEdit={handleEditEvent}
+          onDelete={handleDeleteEvent}
+        />
       )}
 
       {/* Shop Modal */}

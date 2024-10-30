@@ -347,7 +347,7 @@ const Admin: React.FC = () => {
 
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-neutral-900 text-white p-6 rounded-lg shadow-lg relative w-3/5 max-h-[80vh] overflow-y-auto">
+          <div className="bg-neutral-900 text-white p-6 rounded-lg shadow-lg relative w-5/6 md:w-3/5 max-h-[80vh] overflow-y-auto">
             <span
               className="absolute top-1 right-3 text-5xl cursor-pointer"
               onClick={handleCloseModal}
@@ -365,7 +365,7 @@ const Admin: React.FC = () => {
               placeholder="Event Name"
             />
             <button
-              className="bg-green-900 rounded-lg border border-white text-white p-2"
+              className="bg-blue-600 rounded-[25px] text-white p-2 w-full"
               onClick={() => document.getElementById("fileInput")?.click()}
             >
               {imagePreview ? "Change Photo" : "📷 Add Event Photo"}
@@ -393,16 +393,28 @@ const Admin: React.FC = () => {
                   accept="image/*"
                   onChange={(e) => handleArtistImageChange(index, e)}
                 />
-                <button
-                  className="bg-neutral-900 rounded-lg border border-white text-white p-2 mb-2"
-                  onClick={() =>
-                    document.getElementById(`artistFileInput-${index}`)?.click()
-                  }
-                >
-                  {artistImagePreviews[index]
-                    ? "Change Artist Photo"
-                    : "Add Artist Photo"}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    className="bg-blue-600 rounded-[25px] text-white p-2 mb-2 w-full"
+                    onClick={() =>
+                      document
+                        .getElementById(`artistFileInput-${index}`)
+                        ?.click()
+                    }
+                  >
+                    {artistImagePreviews[index]
+                      ? "Change Artist Photo"
+                      : "Add Artist Photo"}
+                  </button>
+                  {artists.length > 1 && (
+                    <button
+                      className="bg-red-900 rounded-[25px] text-white p-2 mb-2 w-full"
+                      onClick={() => handleRemoveArtist(index)}
+                    >
+                      Remove Artist
+                    </button>
+                  )}
+                </div>
                 {artistImagePreviews[index] && (
                   <img
                     src={artistImagePreviews[index]}
@@ -410,19 +422,10 @@ const Admin: React.FC = () => {
                     className="w-60 h-60 object-cover mt-2 mb-2"
                   />
                 )}
-
-                {artists.length > 1 && (
-                  <button
-                    className="bg-red-900 rounded-lg border border-white text-white p-2 mb-2 ml-2"
-                    onClick={() => handleRemoveArtist(index)}
-                  >
-                    Remove Artist
-                  </button>
-                )}
               </div>
             ))}
             <button
-              className="bg-green-900 rounded-lg border border-white text-white p-2 mb-2"
+              className="bg-green-700 rounded-[25px] text-white p-2 mb-2 w-full"
               onClick={handleAddArtist}
             >
               + Add Artist
@@ -496,7 +499,7 @@ const Admin: React.FC = () => {
             />
 
             <button
-              className="bg-green-900 rounded-lg border border-white text-white p-2 my-2 w-full"
+              className="bg-green-700 rounded-[25px] text-white p-2 mt-2 w-full"
               onClick={editingEvent ? handleUpdateEvent : handleAddEvent}
             >
               {editingEvent ? "Update Event" : "Add Event"}

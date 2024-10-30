@@ -87,7 +87,7 @@ const AdminShop = ({ showShopModal, onClose }: AdminShopProps) => {
               ADD SHOP ITEM
             </h2>
             <input
-              className="bg-neutral-900 rounded-lg border border-white p-2 mb-2 w-full text-white"
+              className="bg-neutral-900 rounded-lg border border-white p-2 w-full text-white"
               type="text"
               value={shopItemName}
               onChange={(e) => setShopItemName(e.target.value)}
@@ -100,16 +100,16 @@ const AdminShop = ({ showShopModal, onClose }: AdminShopProps) => {
               onChange={handleImageUpload}
             />
             {imagePreview && (
-              <div className="flex justify-center my-2">
+              <div className="flex justify-center mt-3">
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="w-64 h-64 object-cover items-center justify-center my-2"
+                  className="w-64 h-64 object-cover items-center justify-center"
                 />
               </div>
             )}
             <button
-              className="w-full bg-green-900 rounded-lg border border-white text-white p-2 mb-2"
+              className="w-full bg-blue-600 rounded-[25px] text-white p-2 my-3"
               onClick={() => document.getElementById("fileInput")?.click()}
             >
               {imagePreview ? "Change Photo" : "📷 Add Shop Item Photo"}
@@ -136,7 +136,7 @@ const AdminShop = ({ showShopModal, onClose }: AdminShopProps) => {
               placeholder="Shop Item Stock"
             />
             <button
-              className="w-full bg-green-900 rounded-lg border border-white text-white p-2 mt-4"
+              className="w-full bg-green-700 rounded-[25px] text-white p-2 mt-2"
               onClick={handleAddItem}
             >
               Add Shop Item

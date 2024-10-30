@@ -16,7 +16,7 @@ const DisplayEventModal: React.FC<DisplayEventModalProps> = ({
 }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-neutral-900 text-white p-6 sm:p-8 rounded-lg shadow-lg relative w-11/12 md:w-3/5 max-h-[80vh] overflow-y-auto">
+      <div className="bg-neutral-900 text-white p-6 sm:p-8 rounded-lg shadow-lg relative w-5/6 md:w-3/5 max-h-[80vh] overflow-y-auto">
         <span
           className="absolute top-1 right-3 text-5xl sm:text-5xl cursor-pointer"
           onClick={onClose}
